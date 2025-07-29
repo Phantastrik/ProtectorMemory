@@ -71,9 +71,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 notes.forEach(note => {
                     const li = document.createElement("li");
                     li.classList.add("note-item");
+                    const formattedContent = note.content.replace(/\n/g, "<br>");
+
+
                     li.innerHTML = `
                 <strong>${note.title}</strong><br>
-                <span>${note.content}</span><br>
+                <span>${formattedContent}</span><br>
                 <button class="btn btn-sm btn-warning edit-note" data-id="${note.id}">Modifier</button>
                 <button class="btn btn-sm btn-danger delete-note" data-id="${note.id}">Supprimer</button>
             `;
