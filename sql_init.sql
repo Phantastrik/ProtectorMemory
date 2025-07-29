@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 29 juil. 2025 à 17:11
+-- Généré le : mar. 29 juil. 2025 à 17:51
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -52,19 +52,20 @@ CREATE TABLE `notes` (
   `id` int(11) NOT NULL,
   `pin_id` int(11) NOT NULL,
   `content` text NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `created_at` datetime DEFAULT current_timestamp(),
+  `title` varchar(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `notes`
 --
 
-INSERT INTO `notes` (`id`, `pin_id`, `content`, `created_at`) VALUES
-(1, 12, 'arrr', '2025-07-29 16:02:17'),
-(2, 11, 'aa', '2025-07-29 16:04:22'),
-(3, 12, 'aaaaaaa', '2025-07-29 16:08:46'),
-(4, 13, 'Test', '2025-07-29 16:18:06'),
-(5, 13, 'Lorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet', '2025-07-29 16:18:22');
+INSERT INTO `notes` (`id`, `pin_id`, `content`, `created_at`, `title`) VALUES
+(4, 13, 'Test', '2025-07-29 16:18:06', ''),
+(5, 13, 'Lorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet', '2025-07-29 16:18:22', ''),
+(6, 10, 'FFF', '2025-07-29 17:47:37', 'ZIZI'),
+(7, 10, 'qsdqsd', '2025-07-29 17:48:11', 'aqzsd'),
+(8, 10, 'cdcc', '2025-07-29 17:48:40', 'SDSD');
 
 -- --------------------------------------------------------
 
@@ -88,8 +89,6 @@ CREATE TABLE `pins` (
 
 INSERT INTO `pins` (`id`, `x_percent`, `y_percent`, `created_at`, `image_id`, `title`, `color`) VALUES
 (10, 54.5741, 46.3051, '2025-07-29 15:46:16', 1, 'Mon pin', '#ff00EE'),
-(11, 57.7219, 51.3111, '2025-07-29 15:49:38', 1, 'test', '#ff0000'),
-(12, 66.0883, 40.7628, '2025-07-29 15:54:21', 1, 'Mon pin', '#ff0000'),
 (13, 59.4577, 51.3136, '2025-07-29 16:18:01', 2, 'Mon pin', '#220000'),
 (14, 76.1007, 41.2919, '2025-07-29 16:18:48', 2, 'ABEC', '#552200'),
 (15, 40.447, 73.4601, '2025-07-29 17:03:31', 1, 'Mon pin', '#ffc107'),
@@ -135,7 +134,7 @@ ALTER TABLE `images`
 -- AUTO_INCREMENT pour la table `notes`
 --
 ALTER TABLE `notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT pour la table `pins`

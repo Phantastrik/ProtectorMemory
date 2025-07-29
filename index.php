@@ -57,9 +57,11 @@ $imagePath = "images/" . $currentImage['filename'];
                 <ul id="notes-ul" class="list-group mb-3"></ul>
 
                 <div class="mb-2">
-                    <textarea id="note-content" class="form-control" placeholder="Nouvelle note..."></textarea>
+                    <input type="text" id="note-title" placeholder="Titre de la note" />
+                    <textarea id="note-content" placeholder="Contenu de la note..."></textarea>
+                    <button id="add-note-btn">Ajouter la note</button>
                 </div>
-                <button id="add-note-btn" class="btn btn-primary">Ajouter la note</button>
+
             </div>
         </div>
     </div>
