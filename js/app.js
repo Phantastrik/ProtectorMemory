@@ -6,11 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedPinId = null;
 
     const COLORS = [
-        { name: "Rouge", value: "#ff4b4b" },
-        { name: "Bleu", value: "#4b7bff" },
-        { name: "Vert", value: "#28a745" },
-        { name: "Jaune", value: "#ffc107" },
-        { name: "Violet", value: "#a347ff" }
+        { name: "Kiore", value: "#eb9b34" },
+        { name: "Bruja", value: "#753b1e" },
+        { name: "Curbitus", value: "#7cd121" },
+        { name: "Mousseron", value: "#5170d6" },
+        { name: "Dark", value: "#222222" },
+        { name: "Light", value: "#EEEEEE" }
     ];
 
     let imageId = parseInt(image.dataset.imageId);
@@ -66,13 +67,82 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(notes => {
                 const notesUl = document.getElementById("notes-ul");
                 notesUl.innerHTML = "";
+
                 notes.forEach(note => {
                     const li = document.createElement("li");
-                    li.innerHTML = `<strong>${note.title}</strong><br>${note.content}`;
+                    li.classList.add("note-item");
+                    li.innerHTML = `
+                <strong>${note.title}</strong><br>
+                <span>${note.content}</span><br>
+                <button class="btn btn-sm btn-warning edit-note" data-id="${note.id}">Modifier</button>
+                <button class="btn btn-sm btn-danger delete-note" data-id="${note.id}">Supprimer</button>
+            `;
+
                     notesUl.appendChild(li);
+                });
+
+                // Ajouter les écouteurs pour modifier
+                document.querySelectorAll(".edit-note").forEach(button => {
+                    button.addEventListener("click", () => {
+                        const noteId = button.dataset.id;
+                        const li = button.closest("li");
+                        const title = li.querySelector("strong").innerText;
+                        const content = li.querySelector("span").innerText;
+
+                        document.getElementById("note-title").value = title;
+                        document.getElementById("note-content").value = content;
+                        document.getElementById("add-note-btn").innerText = "Modifier";
+
+                        document.getElementById("add-note-btn").onclick = () => {
+                            const newTitle = document.getElementById("note-title").value.trim();
+                            const newContent = document.getElementById("note-content").value.trim();
+
+                            if (!newTitle || !newContent) return alert("Titre ou contenu vide.");
+
+                            fetch("controllers/edit_note.php", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                                body: `id=${noteId}&title=${encodeURIComponent(newTitle)}&content=${encodeURIComponent(newContent)}`
+                            })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        loadNotes(pinId);
+                                        document.getElementById("note-title").value = "";
+                                        document.getElementById("note-content").value = "";
+                                        document.getElementById("add-note-btn").innerText = "Ajouter la note";
+                                    } else {
+                                        alert("Erreur de modification");
+                                    }
+                                });
+                        };
+                    });
+                });
+
+                // Écouteurs pour supprimer
+                document.querySelectorAll(".delete-note").forEach(button => {
+                    button.addEventListener("click", () => {
+                        const noteId = button.dataset.id;
+                        if (confirm("Supprimer cette note ?")) {
+                            fetch("controllers/delete_note.php", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                                body: `id=${noteId}`
+                            })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        loadNotes(pinId);
+                                    } else {
+                                        alert("Erreur de suppression");
+                                    }
+                                });
+                        }
+                    });
                 });
             });
     }
+
 
 
     function attachNoteActions() {
@@ -110,6 +180,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("add-note-btn").addEventListener("click", () => {
         const title = document.getElementById("note-title").value.trim();
         const content = document.getElementById("note-content").value.trim();
+        if (!selectedPinId) {
+            alert("Choisir un pin");
+            return;
+        }
 
         if (!title) {
             alert("Merci de saisir un titre pour la note.");

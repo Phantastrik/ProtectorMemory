@@ -28,7 +28,7 @@ $imagePath = "images/" . $currentImage['filename'];
 <body class="p-4">
 
     <div class="container-fluid">
-        <h2 class="mb-3">Notes sur image</h2>
+        <h2 class="mb-3">Protector Memory Hex Pinner</h2>
 
         <!-- Sélecteur d’image -->
         <div class="mb-3">
@@ -40,6 +40,10 @@ $imagePath = "images/" . $currentImage['filename'];
                     </option>
                 <?php endforeach; ?>
             </select>
+        </div>
+        <!-- generateur de PNJ -->
+        <div class="mb-3">
+            <a href="PNJ_generator/index.html">Generateur de PNJ</a>
         </div>
 
         <div class="row">
@@ -57,9 +61,14 @@ $imagePath = "images/" . $currentImage['filename'];
                 <ul id="notes-ul" class="list-group mb-3"></ul>
 
                 <div class="mb-2">
-                    <input type="text" id="note-title" placeholder="Titre de la note" />
-                    <textarea id="note-content" placeholder="Contenu de la note..."></textarea>
-                    <button id="add-note-btn">Ajouter la note</button>
+
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <input type="text" id="note-title" class="card-title" placeholder="Titre de la note" /> <br>
+                            <textarea id="note-content" class="card-text" placeholder="Contenu de la note..."></textarea> <br>
+                            <button id="add-note-btn" class="btn btn-primary">Ajouter la note</button>
+                        </div>
+                    </div>
                 </div>
 
             </div>
