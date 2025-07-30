@@ -17,6 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
         { name: "Bruja", value: "#753b1e" },
         { name: "Curbitus", value: "#7cd121" },
         { name: "Mousseron", value: "#5170d6" },
+        { name: "Jardin", value: "#De70d6" },
+        { name: "Plaine inondée", value: "#33FFd6" },
         { name: "Dark", value: "#222255" },
         { name: "Light", value: "#CCCCAA" }
     ];
