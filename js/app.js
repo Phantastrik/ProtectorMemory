@@ -1,21 +1,30 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+    //*************************//
+    //******DECLARATIONS*******//
+    //*************************//
+
     const imageContainer = document.getElementById("image-container");
     const image = document.getElementById("main-image");
     const imageSelect = document.getElementById("image-select");
     const noteList = document.getElementById("note-list");
     let selectedPinId = null;
-
     const COLORS = [
         { name: "Kiore", value: "#eb9b34" },
         { name: "Bruja", value: "#753b1e" },
         { name: "Curbitus", value: "#7cd121" },
         { name: "Mousseron", value: "#5170d6" },
-        { name: "Dark", value: "#222222" },
-        { name: "Light", value: "#EEEEEE" }
+        { name: "Dark", value: "#222255" },
+        { name: "Light", value: "#CCCCAA" }
     ];
 
     let imageId = parseInt(image.dataset.imageId);
 
+    //*******************************//
+    // FONCTIONS CONCERNANT LES PINS //
+    //*******************************//
+
+    // LOAD //
     function loadPins() {
         // Supprimer les anciens pins
         imageContainer.querySelectorAll(".pin").forEach(pin => pin.remove());
@@ -28,7 +37,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
     }
+    // LISTENER CREATION // 
+    imageContainer.addEventListener("click", (e) => {
+        const rect = image.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
 
+        // Demande le titre
+        const title = prompt("Titre du pin :", "Mon pin");
+        if (title === null) return;
+
+        pendingPinCoords = { x, y, title };
+
+        showColorPicker(e.clientX, e.clientY);
+
+    });
+
+    // CREATION //
     function createPinElement(pinData) {
         const pin = document.createElement("div");
         pin.classList.add("pin");
@@ -61,195 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         imageContainer.appendChild(pin);
     }
 
-    function loadNotes(pinId) {
-        fetch(`controllers/load_notes.php?pin_id=${pinId}`)
-            .then(res => res.json())
-            .then(notes => {
-                const notesUl = document.getElementById("notes-ul");
-                notesUl.innerHTML = "";
-
-                notes.forEach(note => {
-                    const li = document.createElement("li");
-                    li.classList.add("note-item");
-                    const formattedContent = note.content.replace(/\n/g, "<br>");
-
-
-                    li.innerHTML = `
-                <strong>${note.title}</strong><br>
-                <span>${formattedContent}</span><br>
-                <button class="btn btn-sm btn-warning edit-note" data-id="${note.id}">Modifier</button>
-                <button class="btn btn-sm btn-danger delete-note" data-id="${note.id}">Supprimer</button>
-            `;
-
-                    notesUl.appendChild(li);
-                });
-
-                // Ajouter les écouteurs pour modifier
-                document.querySelectorAll(".edit-note").forEach(button => {
-                    button.addEventListener("click", () => {
-                        const noteId = button.dataset.id;
-                        const li = button.closest("li");
-                        const title = li.querySelector("strong").innerText;
-                        const content = li.querySelector("span").innerText;
-
-                        document.getElementById("note-title").value = title;
-                        document.getElementById("note-content").value = content;
-                        document.getElementById("add-note-btn").innerText = "Modifier";
-
-                        document.getElementById("add-note-btn").onclick = () => {
-                            const newTitle = document.getElementById("note-title").value.trim();
-                            const newContent = document.getElementById("note-content").value.trim();
-
-                            if (!newTitle || !newContent) return alert("Titre ou contenu vide.");
-
-                            fetch("controllers/edit_note.php", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                                body: `id=${noteId}&title=${encodeURIComponent(newTitle)}&content=${encodeURIComponent(newContent)}`
-                            })
-                                .then(res => res.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        loadNotes(pinId);
-                                        document.getElementById("note-title").value = "";
-                                        document.getElementById("note-content").value = "";
-                                        document.getElementById("add-note-btn").innerText = "Ajouter la note";
-                                    } else {
-                                        alert("Erreur de modification");
-                                    }
-                                });
-                        };
-                    });
-                });
-
-                // Écouteurs pour supprimer
-                document.querySelectorAll(".delete-note").forEach(button => {
-                    button.addEventListener("click", () => {
-                        const noteId = button.dataset.id;
-                        if (confirm("Supprimer cette note ?")) {
-                            fetch("controllers/delete_note.php", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                                body: `id=${noteId}`
-                            })
-                                .then(res => res.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        loadNotes(pinId);
-                                    } else {
-                                        alert("Erreur de suppression");
-                                    }
-                                });
-                        }
-                    });
-                });
-            });
-    }
-
-
-
-    function attachNoteActions() {
-        document.querySelectorAll(".edit-note").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const noteId = btn.dataset.id;
-                const currentText = btn.closest("li").querySelector(".note-text").textContent;
-                const newText = prompt("Modifier la note :", currentText);
-                if (newText !== null) {
-                    fetch("controllers/edit_note.php", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id: noteId, content: newText })
-                    }).then(res => res.json())
-                        .then(data => data.success && loadNotes(selectedPinId));
-                }
-            });
-        });
-
-        document.querySelectorAll(".delete-note").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const noteId = btn.dataset.id;
-                if (confirm("Supprimer cette note ?")) {
-                    fetch("controllers/delete_note.php", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id: noteId })
-                    }).then(res => res.json())
-                        .then(data => data.success && loadNotes(selectedPinId));
-                }
-            });
-        });
-    }
-
-    document.getElementById("add-note-btn").addEventListener("click", () => {
-        const title = document.getElementById("note-title").value.trim();
-        const content = document.getElementById("note-content").value.trim();
-        if (!selectedPinId) {
-            alert("Choisir un pin");
-            return;
-        }
-
-        if (!title) {
-            alert("Merci de saisir un titre pour la note.");
-            return;
-        }
-        if (!content) {
-            alert("Le contenu de la note est vide.");
-            return;
-        }
-
-        // Exemple d'envoi vers le backend
-        fetch("controllers/add_note.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    // rafraîchir la liste des notes
-                    loadNotes(selectedPinId);
-                    // réinitialiser les champs
-                    document.getElementById("note-title").value = "";
-                    document.getElementById("note-content").value = "";
-                } else {
-                    alert("Erreur lors de l'ajout de la note : " + data.message);
-                }
-            });
-    });
-
-    imageContainer.addEventListener("click", (e) => {
-        const rect = image.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-        // Demande le titre
-        const title = prompt("Titre du pin :", "Mon pin");
-        if (title === null) return;
-
-        pendingPinCoords = { x, y, title };
-
-        showColorPicker(e.clientX, e.clientY);
-
-    });
-
-    // Changement d’image via le sélecteur
-    imageSelect.addEventListener("change", () => {
-        const newId = parseInt(imageSelect.value);
-        imageId = newId;
-        selectedPinId = null;
-
-        // Recharge image
-        fetch(`controllers/get_image.php?id=${newId}`)
-            .then(res => res.json())
-            .then(data => {
-                image.src = "images/" + data.filename;
-                image.dataset.imageId = newId;
-                loadPins();
-                document.getElementById("pin-info").innerHTML = "<h5>Pin sélectionné</h5><p>...</p>";
-                document.getElementById("notes-ul").innerHTML = "";
-            });
-    });
-
+    // COLOR PICKER CREATION PIN //
     function showColorPicker(x, y) {
         // Supprimer l'existant
         const existing = document.getElementById("color-picker");
@@ -288,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(picker);
     }
 
+    // CREATION DU PIN AVEC LA COULEUR CHOISIE // 
     function createPinWithColor(color) {
         const { x, y, title } = pendingPinCoords;
         if (!title) return;
@@ -309,6 +147,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
     }
+
+    // SUPPRESSION DU PIN //
     function deletePin(id) {
         fetch("controllers/delete_pin.php", {
             method: "POST",
@@ -335,12 +175,175 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    //********************************//
+    // FONCTIONS CONCERNANT LES NOTES //
+    //********************************//
+    // LOAD //
+    function loadNotes(pinId) {
+        fetch(`controllers/load_notes.php?pin_id=${pinId}`)
+            .then(res => res.json())
+            .then(notes => {
+                const notesUl = document.getElementById("notes-ul");
+                notesUl.innerHTML = "";
+
+                notes.forEach(note => {
+                    const li = document.createElement("div");
+                    li.classList.add("note-item");
+                    const formattedContent = note.content.replace(/\n/g, "<br>");
+
+
+                    li.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">${note.title}</h5>
+                    <p class="card-text">${formattedContent}</p>
+                    <button class="btn btn-sm btn-warning edit-note" data-id="${note.id}">Modifier</button>
+                    <button class="btn btn-sm btn-danger delete-note" data-id="${note.id}">Supprimer</button>
+                </div>
+            </div>
+            `;
+
+                    notesUl.appendChild(li);
+                });
+
+                // Ajouter les écouteurs pour modifier
+                document.querySelectorAll(".edit-note").forEach(button => {
+                    button.onclick = () => {
+                        const noteId = button.dataset.id;
+                        const card = button.closest(".card-body");
+                        const title = card.querySelector(".card-title").innerText;
+                        const content = card.querySelector(".card-text").innerText;
+
+                        document.getElementById("note-title").value = title;
+                        document.getElementById("note-content").value = content;
+                        document.getElementById("add-note-btn").innerText = "Modifier";
+
+                        document.getElementById("add-note-btn").onclick = () => noteEditListener(noteId);
+                    };
+                });
+
+                // Écouteurs pour supprimer
+                document.querySelectorAll(".delete-note").forEach(button => {
+                    button.addEventListener("click", () => {
+                        const noteId = button.dataset.id;
+                        if (confirm("Supprimer cette note ?")) {
+                            fetch("controllers/delete_note.php", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                                body: `id=${noteId}`
+                            })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        loadNotes(selectedPinId);
+                                    } else {
+                                        alert("Erreur de suppression");
+                                    }
+                                });
+                        }
+                    });
+                });
+                document.getElementById("add-note-btn").onclick = noteCreationListener;
+            });
+    }
+    function noteEditListener(noteId) {
+        const newTitle = document.getElementById("note-title").value.trim();
+        const newContent = document.getElementById("note-content").value.trim();
+
+        if (!newTitle || !newContent) return alert("Titre ou contenu vide.");
+
+        fetch("controllers/edit_note.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `id=${noteId}&title=${encodeURIComponent(newTitle)}&content=${encodeURIComponent(newContent)}`
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadNotes(selectedPinId);
+                    document.getElementById("note-title").value = "";
+                    document.getElementById("note-content").value = "";
+                    document.getElementById("add-note-btn").innerText = "Ajouter la note";
+                    document.getElementById("add-note-btn").onclick = () => noteCreationListener();
+
+                } else {
+                    alert("Erreur de modification");
+                }
+            });
+    }
+    // LISTENER CREATION //
+    document.getElementById("add-note-btn").onclick = noteCreationListener;
+    function noteCreationListener() {
+        const title = document.getElementById("note-title").value.trim();
+        const content = document.getElementById("note-content").value.trim();
+        if (!selectedPinId) {
+            alert("Choisir un pin");
+            return;
+        }
+
+        if (!title) {
+            alert("Merci de saisir un titre pour la note.");
+            return;
+        }
+        if (!content) {
+            alert("Le contenu de la note est vide.");
+            return;
+        }
+
+        // Exemple d'envoi vers le backend
+        fetch("controllers/add_note.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // rafraîchir la liste des notes
+                    loadNotes(selectedPinId);
+                    // réinitialiser les champs
+                    document.getElementById("note-title").value = "";
+                    document.getElementById("note-content").value = "";
+                } else {
+                    alert("Erreur lors de l'ajout de la note : " + data.message);
+                }
+            });
+    }
+
+    //***************************************//
+    // FONCTIONS CONCERNANT L'IMAGE DE FOND' //
+    //***************************************//
+
+    // LISTENER CHANGEMENT IMAGE //
+    imageSelect.addEventListener("change", () => {
+        const newId = parseInt(imageSelect.value);
+        imageId = newId;
+        selectedPinId = null;
+
+        // Recharge image
+        fetch(`controllers/get_image.php?id=${newId}`)
+            .then(res => res.json())
+            .then(data => {
+                image.src = "images/" + data.filename;
+                image.dataset.imageId = newId;
+                loadPins();
+                document.getElementById("pin-info").innerHTML = "<h5>Pin sélectionné</h5><p>...</p>";
+                document.getElementById("notes-ul").innerHTML = "";
+            });
+    });
+
+
+
+    //************************//
+    //********* MAIN *********//
+    //************************//
+
     loadPins();
+
     // document.addEventListener("click", (e) => {
     //     const picker = document.getElementById("color-picker");
     //     if (picker && !picker.contains(e.target)) {
     //         picker.remove();
     //     }
     // });
-
 });

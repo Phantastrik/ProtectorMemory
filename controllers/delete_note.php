@@ -7,8 +7,8 @@ if ($conn->connect_error) {
     exit;
 }
 
-$data = json_decode(file_get_contents("php://input"), true);
-$id = (int)($data["id"] ?? 0);
+
+$id = intval($_POST["id"] ?? 0);
 if ($id <= 0) {
     http_response_code(400);
     echo json_encode(["error" => "ID invalide"]);

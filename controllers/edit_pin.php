@@ -7,15 +7,16 @@ if ($conn->connect_error) {
     exit;
 }
 
-$data = $_POST;
+$data = json_decode(file_get_contents("php://input"), true);
 $id = (int)($data["id"] ?? 0);
 $content = trim($data["content"] ?? "");
+
 if ($id <= 0 || $content === "") {
     http_response_code(400);
     echo json_encode(["error" => "Paramètres invalides"]);
     exit;
 }
 
-$stmt = $conn->prepare("UPDATE notes SET content = ?, created_at = NOW() WHERE id = ?");
+$stmt = $conn->prepare("UPDATE notes SET content = ?, updated_at = NOW() WHERE id = ?");
 $stmt->bind_param("si", $content, $id);
 echo json_encode(["success" => $stmt->execute()]);

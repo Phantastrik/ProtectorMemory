@@ -52,24 +52,28 @@ $imagePath = "images/" . $currentImage['filename'];
 
             </div>
 
+
             <div class="col-md-4" id="note-list">
                 <div id="pin-info" class="mb-3">
                     <h5>Pin sélectionné</h5>
                     <p>...</p>
                 </div>
+                <div class="card">
+
+                    <div class="card-body">
+                        <div class="card-title">
+                            <label for="note-title" class="form-label">Titre</label>
+                            <input type="text" id="note-title" class="form-control" placeholder="Titre de la note" />
+                        </div>
+                        <label for="note-content" class="form-label">Contenu</label>
+                        <textarea id="note-content" class="form-control" placeholder="Contenu de la note..."></textarea> <br>
+                        <button id="add-note-btn" class="btn btn-primary">Ajouter la note</button>
+                    </div>
+                </div>
 
                 <ul id="notes-ul" class="list-group mb-3"></ul>
 
-                <div class="mb-2">
 
-                    <div class="card" style="width: 18rem;">
-                        <div class="card-body">
-                            <input type="text" id="note-title" class="card-title" placeholder="Titre de la note" /> <br>
-                            <textarea id="note-content" class="card-text" placeholder="Contenu de la note..."></textarea> <br>
-                            <button id="add-note-btn" class="btn btn-primary">Ajouter la note</button>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </div>
