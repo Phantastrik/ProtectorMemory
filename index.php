@@ -31,23 +31,35 @@ $imagePath = "images/" . $currentImage['filename'];
         <h2 class="mb-3">Protector Memory Hex Pinner</h2>
 
         <!-- Sélecteur d’image -->
-        <div class="mb-3">
-            <label for="image-select" class="form-label">Choisir une image :</label>
-            <select id="image-select" class="form-select w-auto d-inline-block">
-                <?php foreach ($images as $img): ?>
-                    <option value="<?= $img['id'] ?>" <?= $img['id'] == $selectedImageId ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($img['title'] ?? $img['filename']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <!-- generateur de PNJ -->
-        <div class="mb-3">
-            <a href="PNJ_generator/index.html">Generateur de PNJ</a>
+        <div class="row">
+            <div class="col mb-3">
+                <label for="image-select" class="form-label">Choisir une image :</label>
+                <select id="image-select" class="form-select w-auto d-inline-block">
+                    <?php foreach ($images as $img): ?>
+                        <option value="<?= $img['id'] ?>" <?= $img['id'] == $selectedImageId ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($img['title'] ?? $img['filename']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col mb-3">
+                <button id="link-mode-btn" class="btn btn-outline-primary mb-2">Relier des pins</button>
+            </div>
+            <!-- generateur de PNJ -->
+            <div class="col mb-3">
+                <button class="btn btn-outline-primary mb-2" onclick="window.open('PNJ_generator/index.html', '_blank')">Générateur de PNJ</button>
+
+            </div>
         </div>
 
         <div class="row">
+
             <div class="col-md-8 position-relative" id="image-container">
+                <svg
+                    id="connections"
+                    class="position-absolute w-100 h-100"
+                    style="top: 0; left: 0; pointer-events: none;"></svg>
+
                 <img id="main-image" src="<?= htmlspecialchars($imagePath) ?>" data-image-id="<?= $selectedImageId ?>" alt="Image">
 
             </div>

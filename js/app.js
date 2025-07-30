@@ -9,6 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const imageSelect = document.getElementById("image-select");
     const noteList = document.getElementById("note-list");
     let selectedPinId = null;
+    let linkMode = false;
+    let linkStartPin = null;
+    let links = [];
     const COLORS = [
         { name: "Kiore", value: "#eb9b34" },
         { name: "Bruja", value: "#753b1e" },
@@ -36,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     createPinElement(pinData);
                 });
             });
+        loadLinks();
     }
     // LISTENER CREATION // 
     imageContainer.addEventListener("click", (e) => {
@@ -66,6 +70,21 @@ document.addEventListener("DOMContentLoaded", () => {
         pin.addEventListener("click", function (event) {
             event.stopPropagation();
             selectedPinId = pinData.id;
+            if (linkMode) {
+                if (!linkStartPin) {
+                    linkStartPin = pinData;
+                } else if (linkStartPin.id !== pinData.id) {
+                    // On garde en mémoire les pins à relier
+                    pendingLink = {
+                        from: linkStartPin.id,
+                        to: pinData.id
+                    };
+                    // Affiche le color picker à la position du clic
+                    showLinkColorPicker(event.clientX, event.clientY);
+                }
+                return; // Sortir du handler si en mode lien
+            }
+
 
             document.getElementById("pin-info").innerHTML = `
         <h5>${pinData.title || "Sans titre"}</h5>
@@ -148,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
+
     // SUPPRESSION DU PIN //
     function deletePin(id) {
         fetch("controllers/delete_pin.php", {
@@ -172,6 +192,167 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             })
             .catch(() => alert("Erreur réseau lors de la suppression du pin"));
+    }
+
+    //**********************************//
+    //*******LIENS ENTRE LES PINS*******//
+    //**********************************//
+
+    function loadLinks() {
+        const svg = document.getElementById("connections");
+        svg.innerHTML = ""; // Nettoyer les anciennes lignes
+        links = [];
+        fetch(`controllers/load_links.php?image_id=${imageId}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(link => {
+                    links.push(link);
+                    drawConnection(link);
+                });
+            });
+    }
+    function drawConnection(link) {
+        const svg = document.getElementById("connections");
+        const image = document.getElementById("main-image");
+
+        // Met à jour la taille et viewBox du SVG
+        const rect = image.getBoundingClientRect();
+        svg.style.width = rect.width + "px";
+        svg.style.height = rect.height + "px";
+        svg.setAttribute("viewBox", `0 0 ${rect.width} ${rect.height}`);
+
+        // Récupérer les éléments pins (par ex via leurs ids stockés dans link)
+        const pin1 = document.querySelector(`.pin[data-pin-id="${link.pin1_id}"]`);
+        const pin2 = document.querySelector(`.pin[data-pin-id="${link.pin2_id}"]`);
+
+        if (!pin1 || !pin2) return;
+
+
+        const x1Percent = parseFloat(pin1.style.left);  // déjà en %
+        const y1Percent = parseFloat(pin1.style.top);
+        const x2Percent = parseFloat(pin2.style.left);
+        const y2Percent = parseFloat(pin2.style.top);
+
+        const x1 = (x1Percent / 100) * rect.width;
+        const y1 = (y1Percent / 100) * rect.height;
+        const x2 = (x2Percent / 100) * rect.width;
+        const y2 = (y2Percent / 100) * rect.height;
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", link.color || "#000");
+        line.setAttribute("stroke-width", "2");
+
+        svg.appendChild(line);
+    }
+
+    document.getElementById("link-mode-btn").addEventListener("click", () => {
+        linkMode = !linkMode;
+        linkStartPin = null;
+
+        const btn = document.getElementById("link-mode-btn");
+        btn.classList.toggle("btn-primary", linkMode);
+        btn.classList.toggle("btn-outline-primary", !linkMode);
+        btn.textContent = linkMode ? "Sélectionner 2 pins..." : "Relier des pins";
+    });
+
+    function saveLink(pin1_id, pin2_id, color) {
+        fetch("controllers/add_link.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `pin1_id=${pin1_id}&pin2_id=${pin2_id}&color=${encodeURIComponent(color)}`
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadLinks();
+                } else {
+                    alert("Erreur lors de l’enregistrement du lien.");
+                }
+            })
+            .catch(() => alert("Erreur réseau lors de la création du lien"));
+    }
+    function updateSVGViewBox() {
+        const svg = document.getElementById("connections");
+        const image = document.getElementById("main-image");
+        const rect = image.getBoundingClientRect();
+
+        svg.style.width = rect.width + "px";
+        svg.style.height = rect.height + "px";
+
+        svg.setAttribute("viewBox", `0 0 ${rect.width} ${rect.height}`);
+    }
+    function redrawLinks() {
+        const svg = document.getElementById("connections");
+        // Vider le SVG (toutes les lignes précédentes)
+        while (svg.firstChild) {
+            svg.removeChild(svg.firstChild);
+        }
+
+        // Re-dessiner toutes les connections
+        for (const link of links) {
+            console.log("draw link from redraw");
+            drawConnection(link);
+        }
+    }
+
+
+    function showLinkColorPicker(x, y) {
+        // Supprime l'ancien picker s'il existe
+        const existing = document.getElementById("color-picker");
+        if (existing) existing.remove();
+
+        const picker = document.createElement("div");
+        picker.id = "color-picker";
+        picker.style.position = "fixed";
+        picker.style.top = `${y}px`;
+        picker.style.left = `${x}px`;
+        picker.style.background = "#fff";
+        picker.style.border = "1px solid #ccc";
+        picker.style.padding = "8px";
+        picker.style.borderRadius = "6px";
+        picker.style.boxShadow = "0 2px 10px rgba(0,0,0,0.2)";
+        picker.style.zIndex = "9999";
+        picker.style.display = "flex";
+        picker.style.gap = "6px";
+
+        COLORS.forEach(color => {
+            const btn = document.createElement("div");
+            btn.style.backgroundColor = color.value;
+            btn.title = color.name;
+            btn.style.width = "24px";
+            btn.style.height = "24px";
+            btn.style.borderRadius = "50%";
+            btn.style.cursor = "pointer";
+            btn.style.border = "2px solid #ddd";
+            btn.addEventListener("click", () => {
+                document.body.removeChild(picker);
+                createLinkWithColor(color.value);
+            });
+            picker.appendChild(btn);
+        });
+
+        document.body.appendChild(picker);
+    }
+
+
+    function createLinkWithColor(color) {
+        if (!pendingLink) return;
+
+        saveLink(pendingLink.from, pendingLink.to, color);
+
+        // Reset l'état
+        pendingLink = null;
+        linkStartPin = null;
+        linkMode = false;
+
+        const btn = document.getElementById("link-mode-btn");
+        btn.classList.remove("btn-primary");
+        btn.classList.add("btn-outline-primary");
+        btn.textContent = "Relier des pins";
     }
 
 
@@ -329,11 +510,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 loadPins();
                 document.getElementById("pin-info").innerHTML = "<h5>Pin sélectionné</h5><p>...</p>";
                 document.getElementById("notes-ul").innerHTML = "";
+                updateSVGViewBox();
             });
+
+
     });
-
-
-
+    window.addEventListener("resize", () => {
+        updateSVGViewBox();
+        redrawLinks();
+    });
     //************************//
     //********* MAIN *********//
     //************************//

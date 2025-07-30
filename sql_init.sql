@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 29 juil. 2025 à 17:51
+-- Généré le : mer. 30 juil. 2025 à 16:23
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -39,8 +39,8 @@ CREATE TABLE `images` (
 --
 
 INSERT INTO `images` (`id`, `filename`, `title`, `uploaded_at`) VALUES
-(1, '1.png', 'Hex map #1', '2025-07-29 15:04:01'),
-(2, '2.jpg', 'Hex color #2', '2025-07-29 16:17:43');
+(3, '3.jpg', 'Protector Hex Map #1', '2025-07-30 10:59:00'),
+(4, '4.jpg', 'Protector Character Sheet', '2025-07-30 10:59:00');
 
 -- --------------------------------------------------------
 
@@ -55,17 +55,6 @@ CREATE TABLE `notes` (
   `created_at` datetime DEFAULT current_timestamp(),
   `title` varchar(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `notes`
---
-
-INSERT INTO `notes` (`id`, `pin_id`, `content`, `created_at`, `title`) VALUES
-(4, 13, 'Test', '2025-07-29 16:18:06', ''),
-(5, 13, 'Lorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet \nLorem ipsum dolor sit amet', '2025-07-29 16:18:22', ''),
-(6, 10, 'FFF', '2025-07-29 17:47:37', 'ZIZI'),
-(7, 10, 'qsdqsd', '2025-07-29 17:48:11', 'aqzsd'),
-(8, 10, 'cdcc', '2025-07-29 17:48:40', 'SDSD');
 
 -- --------------------------------------------------------
 
@@ -88,13 +77,12 @@ CREATE TABLE `pins` (
 --
 
 INSERT INTO `pins` (`id`, `x_percent`, `y_percent`, `created_at`, `image_id`, `title`, `color`) VALUES
-(10, 54.5741, 46.3051, '2025-07-29 15:46:16', 1, 'Mon pin', '#ff00EE'),
-(13, 59.4577, 51.3136, '2025-07-29 16:18:01', 2, 'Mon pin', '#220000'),
-(14, 76.1007, 41.2919, '2025-07-29 16:18:48', 2, 'ABEC', '#552200'),
-(15, 40.447, 73.4601, '2025-07-29 17:03:31', 1, 'Mon pin', '#ffc107'),
-(16, 45.4829, 48.3176, '2025-07-29 17:03:36', 1, 'Mon pin', '#4b7bff'),
-(17, 56.1994, 34.4811, '2025-07-29 17:03:48', 2, 'Mon pin', '#ffc107'),
-(18, 84.809, 73.8439, '2025-07-29 17:03:58', 2, 'Mon pin', '#a347ff');
+(26, 45.4331, 34.3625, '2025-07-30 15:54:44', 3, 'Pin A', '#eb9b34'),
+(27, 66.2903, 68.8369, '2025-07-30 15:54:52', 3, 'Pin B', '#5170d6'),
+(28, 26.4617, 53.5285, '2025-07-30 16:21:41', 3, 'Mon pin', '#5170d6'),
+(29, 37.8624, 25.4662, '2025-07-30 16:21:44', 3, 'Mon pin', '#753b1e'),
+(30, 34.2029, 75.9393, '2025-07-30 16:22:05', 3, 'Ruin', '#7cd121'),
+(31, 38.1439, 68.1442, '2025-07-30 16:22:13', 3, 'Village', '#7cd121');
 
 --
 -- Index pour les tables déchargées
@@ -128,19 +116,19 @@ ALTER TABLE `pins`
 -- AUTO_INCREMENT pour la table `images`
 --
 ALTER TABLE `images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `notes`
 --
 ALTER TABLE `notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT pour la table `pins`
 --
 ALTER TABLE `pins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- Contraintes pour les tables déchargées
