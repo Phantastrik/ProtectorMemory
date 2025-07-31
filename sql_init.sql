@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 30 juil. 2025 à 16:23
+-- Généré le : jeu. 31 juil. 2025 à 10:46
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -27,20 +27,18 @@ SET time_zone = "+00:00";
 -- Structure de la table `images`
 --
 
-CREATE TABLE `images` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `images` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `filename` varchar(255) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `uploaded_at` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `uploaded_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `images`
 --
 
-INSERT INTO `images` (`id`, `filename`, `title`, `uploaded_at`) VALUES
-(3, '3.jpg', 'Protector Hex Map #1', '2025-07-30 10:59:00'),
-(4, '4.jpg', 'Protector Character Sheet', '2025-07-30 10:59:00');
 
 -- --------------------------------------------------------
 
@@ -48,13 +46,19 @@ INSERT INTO `images` (`id`, `filename`, `title`, `uploaded_at`) VALUES
 -- Structure de la table `notes`
 --
 
-CREATE TABLE `notes` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `notes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `pin_id` int(11) NOT NULL,
   `content` text NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
-  `title` varchar(255) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `title` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `pin_id` (`pin_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `notes`
+--
 
 -- --------------------------------------------------------
 
@@ -62,73 +66,42 @@ CREATE TABLE `notes` (
 -- Structure de la table `pins`
 --
 
-CREATE TABLE `pins` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `pins` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `x_percent` float NOT NULL,
   `y_percent` float NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `image_id` int(11) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `color` varchar(7) DEFAULT '#ff0000'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `color` varchar(7) DEFAULT '#ff0000',
+  `label` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `image_id` (`image_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `pins`
 --
 
-INSERT INTO `pins` (`id`, `x_percent`, `y_percent`, `created_at`, `image_id`, `title`, `color`) VALUES
-(26, 45.4331, 34.3625, '2025-07-30 15:54:44', 3, 'Pin A', '#eb9b34'),
-(27, 66.2903, 68.8369, '2025-07-30 15:54:52', 3, 'Pin B', '#5170d6'),
-(28, 26.4617, 53.5285, '2025-07-30 16:21:41', 3, 'Mon pin', '#5170d6'),
-(29, 37.8624, 25.4662, '2025-07-30 16:21:44', 3, 'Mon pin', '#753b1e'),
-(30, 34.2029, 75.9393, '2025-07-30 16:22:05', 3, 'Ruin', '#7cd121'),
-(31, 38.1439, 68.1442, '2025-07-30 16:22:13', 3, 'Village', '#7cd121');
+-- --------------------------------------------------------
 
 --
--- Index pour les tables déchargées
+-- Structure de la table `pin_links`
 --
 
---
--- Index pour la table `images`
---
-ALTER TABLE `images`
-  ADD PRIMARY KEY (`id`);
+CREATE TABLE IF NOT EXISTS `pin_links` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `pin1_id` int(11) NOT NULL,
+  `pin2_id` int(11) NOT NULL,
+  `color` varchar(7) DEFAULT '#000000',
+  PRIMARY KEY (`id`),
+  KEY `fk_pin1` (`pin1_id`),
+  KEY `fk_pin2` (`pin2_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Index pour la table `notes`
+-- Déchargement des données de la table `pin_links`
 --
-ALTER TABLE `notes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `pin_id` (`pin_id`);
-
---
--- Index pour la table `pins`
---
-ALTER TABLE `pins`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `image_id` (`image_id`);
-
---
--- AUTO_INCREMENT pour les tables déchargées
---
-
---
--- AUTO_INCREMENT pour la table `images`
---
-ALTER TABLE `images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT pour la table `notes`
---
-ALTER TABLE `notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
-
---
--- AUTO_INCREMENT pour la table `pins`
---
-ALTER TABLE `pins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- Contraintes pour les tables déchargées
@@ -145,6 +118,13 @@ ALTER TABLE `notes`
 --
 ALTER TABLE `pins`
   ADD CONSTRAINT `pins_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `pin_links`
+--
+ALTER TABLE `pin_links`
+  ADD CONSTRAINT `fk_pin1` FOREIGN KEY (`pin1_id`) REFERENCES `pins` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_pin2` FOREIGN KEY (`pin2_id`) REFERENCES `pins` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
