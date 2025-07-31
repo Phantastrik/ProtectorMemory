@@ -7,7 +7,7 @@ if ($conn->connect_error) {
 $imageId = intval($_GET["image_id"] ?? 0);
 $sql = "SELECT * FROM pins WHERE image_id = $imageId";
 $result = $conn->query($sql);
-
+var_dump($result);
 $pins = [];
 while ($row = $result->fetch_assoc()) {
     $pins[] = [
@@ -15,7 +15,8 @@ while ($row = $result->fetch_assoc()) {
         "x_percent" => floatval($row["x_percent"]),
         "y_percent" => floatval($row["y_percent"]),
         "title" => $row["title"],
-        "color" => $row["color"]
+        "color" => $row["color"],
+        "label" => $row["label"],
     ];
 }
 

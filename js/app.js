@@ -19,8 +19,12 @@ document.addEventListener("DOMContentLoaded", () => {
         { name: "Mousseron", value: "#5170d6" },
         { name: "Jardin", value: "#De70d6" },
         { name: "Plaine inondée", value: "#33FFd6" },
+        { name: "Village", value: "#222255", label: "🏠" },
+        { name: "People", value: "#EEEEAA", label: "👨‍🌾" },
+        { name: "Train", value: "#EEEEAA", label: "🚂" },
+        { name: "Ruin", value: "#222255", label: "🏛️" },
         { name: "Dark", value: "#222255" },
-        { name: "Light", value: "#CCCCAA" }
+        { name: "Light", value: "#EEEEAA" }
     ];
 
     let imageId = parseInt(image.dataset.imageId);
@@ -68,6 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
         pin.style.backgroundColor = pinData.color || "#ff0000";
         pin.title = pinData.title || "";
         pin.dataset.pinId = pinData.id;
+        if (pinData.label) {
+            pin.textContent = pinData.label;
+        }
 
         pin.addEventListener("click", function (event) {
             event.stopPropagation();
@@ -136,9 +143,19 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.style.borderRadius = "50%";
             btn.style.cursor = "pointer";
             btn.style.border = "2px solid #ddd";
+            if (color.label) {
+                btn.textContent = color.label;
+
+                btn.style.display = "flex";
+                btn.style.alignItems = "center";
+                btn.style.justifyContent = "center";
+                btn.style.fontSize = "14px";
+                btn.style.fontWeight = "bold";
+            }
+
             btn.addEventListener("click", () => {
                 document.body.removeChild(picker);
-                createPinWithColor(color.value);
+                createPinWithColor(color);
             });
             picker.appendChild(btn);
         });
@@ -154,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("controllers/add_pin.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ x, y, image_id: imageId, title, color })
+            body: JSON.stringify({ x, y, image_id: imageId, title, color : color.value, label : color.label })
         }).then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -163,7 +180,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         x_percent: x,
                         y_percent: y,
                         title,
-                        color
+                        color : color.value,
+                        label : color.label
                     });
                 }
             });
@@ -180,15 +198,16 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    // Supprimer le pin du DOM
-                    const pinToDelete = document.querySelector(`.pin[data-pin-id='${id}']`);
-                    if (pinToDelete) pinToDelete.remove();
+                    // // Supprimer le pin du DOM
+                    // const pinToDelete = document.querySelector(`.pin[data-pin-id='${id}']`);
+                    // if (pinToDelete) pinToDelete.remove();
 
-                    // Nettoyer l'affichage des notes
-                    selectedPinId = null;
-                    document.getElementById("pin-info").innerHTML = `<h5>Selectionne un pin</h5><p>...</p>`;
-                    document.getElementById("notes-ul").innerHTML = "";
-                    document.getElementById("note-content").value = "";
+                    // // Nettoyer l'affichage des notes
+                    // selectedPinId = null;
+                    // document.getElementById("pin-info").innerHTML = `<h5>Selectionne un pin</h5><p>...</p>`;
+                    // document.getElementById("notes-ul").innerHTML = "";
+                    // document.getElementById("note-content").value = "";
+                    loadPins();
                 } else {
                     alert("Erreur lors de la suppression du pin : " + data.message);
                 }

@@ -15,7 +15,7 @@ if ($image_id <= 0) {
     exit;
 }
 
-$stmt = $conn->prepare("SELECT id, x_percent, y_percent, title, color FROM pins WHERE image_id = ?");
+$stmt = $conn->prepare("SELECT id, x_percent, y_percent, title, color, label FROM pins WHERE image_id = ?");
 $stmt->bind_param("i", $image_id);
 $stmt->execute();
 $result = $stmt->get_result();
