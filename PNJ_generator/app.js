@@ -118,11 +118,11 @@ function genererPNJ() {
 
     // Affichage
     const resultat = `
-        <p><span class="label">Peuple :</span> ${peuple}</p>
-        <p><span class="label">Nom :</span> ${nom} (Dés: ${d1} & ${d2})</p>
-        <p><span class="label">Âge :</span> ${age} (${carteAge.couleur})</p>
-        <p><span class="label">Personnalité :</span> ${personnalite} (${carteAge.valeur})</p>
-        <p><span class="label">Phrase d'accroche :</span> ${phraseAccroche}</p>
+        <p class="label">Peuple : ${peuple}</p>
+        <p class="label">Nom : ${nom} (Dés: ${d1} & ${d2})</p>
+        <p class="label">Âge : ${age} (${carteAge.couleur})</p>
+        <p class="label">Personnalité : ${personnalite} (${carteAge.valeur})</p>
+        <p class="label">Phrase d'accroche : ${phraseAccroche}</p>
       `;
     const blocPrincipal = document.getElementById("resultatPNJ");
     blocPrincipal.className = `result peuple-${peuple}`;

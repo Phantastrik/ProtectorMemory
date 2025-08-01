@@ -9,6 +9,7 @@ if ($conn->connect_error) {
 
 $data = $_POST;
 $id = (int)($data["id"] ?? 0);
+$title = trim($data["title"] ?? "");
 $content = trim($data["content"] ?? "");
 if ($id <= 0 || $content === "") {
     http_response_code(400);
@@ -16,6 +17,6 @@ if ($id <= 0 || $content === "") {
     exit;
 }
 
-$stmt = $conn->prepare("UPDATE notes SET content = ?, created_at = NOW() WHERE id = ?");
-$stmt->bind_param("si", $content, $id);
+$stmt = $conn->prepare("UPDATE notes SET content = ?, title = ?, created_at = NOW() WHERE id = ?");
+$stmt->bind_param("ssi", $content,$title, $id);
 echo json_encode(["success" => $stmt->execute()]);

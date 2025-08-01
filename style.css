@@ -50,3 +50,23 @@ body {
     border: 2px solid #fff;
     transform: translate(-50%, -50%);
 }
+
+lock-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 150px;
+    text-align: center;
+    font-family: sans-serif;
+}
+
+#clock-canvas {
+    border-radius: 50%;
+    background: #eee;
+    display: block;
+    margin: 0 auto 8px;
+}
+
+.controls {
+    font-size: 12px;
+}

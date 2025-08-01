@@ -24,10 +24,54 @@ document.addEventListener("DOMContentLoaded", () => {
         { name: "Train", value: "#EEEEAA", label: "🚂" },
         { name: "Ruin", value: "#222255", label: "🏛️" },
         { name: "Dark", value: "#222255" },
-        { name: "Light", value: "#EEEEAA" }
+        { name: "Pelerin", value: "#EEEEAA", label: "👤​" }
     ];
 
     let imageId = parseInt(image.dataset.imageId);
+
+    // gestion de l'horloge
+    const canvas = document.getElementById("clock-canvas");
+    const ctx = canvas.getContext("2d");
+    const enduranceSelect = document.getElementById("endurance");
+    const advanceBtn = document.getElementById("advance-btn");
+
+    let currentIndex = 0;
+
+    function drawClock(endurance, index) {
+        const totalSlices = endurance * 2; // jour + nuit
+        const radius = canvas.width / 2;
+        const sliceAngle = (2 * Math.PI) / totalSlices;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < totalSlices; i++) {
+            const start = i * sliceAngle - Math.PI;
+            const end = start + sliceAngle;
+            ctx.beginPath();
+            ctx.moveTo(radius, radius);
+            ctx.arc(radius, radius, radius, start, end);
+            ctx.closePath();
+            ctx.fillStyle = i === index
+                ? "#8052713d"
+                : (i) < (totalSlices / 2) ? "#c6a520ff" : "#061937ff";
+            ctx.fill();
+        }
+    }
+
+
+    enduranceSelect.addEventListener("change", () => {
+        currentIndex = 0;
+        drawClock(parseInt(enduranceSelect.value), currentIndex);
+    });
+
+    advanceBtn.addEventListener("click", () => {
+        const total = parseInt(enduranceSelect.value) * 2;
+        currentIndex = (currentIndex + 1) % total;
+        drawClock(parseInt(enduranceSelect.value), currentIndex);
+    });
+
+    // Initial draw
+    drawClock(parseInt(enduranceSelect.value), currentIndex);
 
     //*******************************//
     // FONCTIONS CONCERNANT LES PINS //
@@ -171,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("controllers/add_pin.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ x, y, image_id: imageId, title, color : color.value, label : color.label })
+            body: JSON.stringify({ x, y, image_id: imageId, title, color: color.value, label: color.label })
         }).then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -180,8 +224,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         x_percent: x,
                         y_percent: y,
                         title,
-                        color : color.value,
-                        label : color.label
+                        color: color.value,
+                        label: color.label
                     });
                 }
             });

@@ -19,7 +19,7 @@ if (!isset($data['x']) || !isset($data['y']) || !isset($data['image_id'])) {
 // Récupérer title et color, mettre des valeurs par défaut si absent
 $title = isset($data['title']) ? $data['title'] : null;
 $color = isset($data['color']) ? $data['color'] : '#ff0000';
-$label = isset($data['label']) ? $data['label'] : null;
+$label = isset($data['label']) ? $data['label'] : '';
 // Préparation et exécution de la requête
 $stmt = $conn->prepare("INSERT INTO pins (x_percent, y_percent, image_id, title, color, label) VALUES (?, ?, ?, ?, ?, ?)");
 $stmt->bind_param("ddisss", $data['x'], $data['y'], $data['image_id'], $title, $color, $label);

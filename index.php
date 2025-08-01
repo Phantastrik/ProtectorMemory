@@ -32,7 +32,7 @@ $imagePath = "images/" . $currentImage['filename'];
 
         <!-- Sélecteur d’image -->
         <div class="row">
-            <div class="col mb-3">
+            <div class="col mb4">
                 <label for="image-select" class="form-label">Choisir une image :</label>
                 <select id="image-select" class="form-select w-auto d-inline-block">
                     <?php foreach ($images as $img): ?>
@@ -42,13 +42,29 @@ $imagePath = "images/" . $currentImage['filename'];
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col mb-3">
+            <div class="col mb4">
                 <button id="link-mode-btn" class="btn btn-outline-primary mb-2">Relier des pins</button>
             </div>
             <!-- generateur de PNJ -->
-            <div class="col mb-3">
+            <div class="col mb4">
                 <button class="btn btn-outline-primary mb-2" onclick="window.open('PNJ_generator/index.html', '_blank')">Générateur de PNJ</button>
 
+            </div>
+
+            <div class="col mb4" id="clock-container">
+                <canvas id="clock-canvas" width="100" height="100"></canvas>
+                <div class="controls">
+                    <label for="endurance">Endurance :</label>
+                    <select id="endurance">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4" selected>4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                    <button id="advance-btn">Avancer</button>
+                </div>
             </div>
         </div>
 
@@ -85,9 +101,9 @@ $imagePath = "images/" . $currentImage['filename'];
 
                 <ul id="notes-ul" class="list-group mb-3"></ul>
 
-
-
             </div>
+
+
         </div>
     </div>
 
