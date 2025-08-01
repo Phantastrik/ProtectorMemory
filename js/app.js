@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedPinId = null;
     let linkMode = false;
     let linkStartPin = null;
+    let pinMoveMode = null;
     let links = [];
     const COLORS = [
         { name: "Kiore", value: "#eb9b34" },
@@ -93,9 +94,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     // LISTENER CREATION // 
     imageContainer.addEventListener("click", (e) => {
+
         const rect = image.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+
+        if (pinMoveMode) {
+
+            fetch("controllers/move_pin.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `id=${pinMoveMode}&x=${x}&y=${y}`
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        loadPins();
+                        pinMoveMode = null;
+                    } else {
+                        alert("Erreur lors du déplacement");
+                    }
+                });
+
+            return; // ⛔ Stop ici, on ne crée pas de nouveau pin
+        }
 
         // Demande le titre
         const title = prompt("Titre du pin :", "Mon pin");
@@ -143,8 +166,12 @@ document.addEventListener("DOMContentLoaded", () => {
         <h5>${pinData.title || "Sans titre"}</h5>
         <p>Coordonnées : ${pinData.x_percent.toFixed(2)}%, ${pinData.y_percent.toFixed(2)}%</p>
         <button id="delete-pin-btn" class="btn btn-danger btn-sm">Supprimer ce pin</button>
-    `;
+        <button class="btn btn-sm btn-secondary move-pin" data-id="${pinData.id}">Déplacer</button>
 
+    `;
+            document.querySelector(".move-pin").addEventListener("click", () => {
+                enterMoveMode(pinData.id);
+            });
             loadNotes(pinData.id);
 
             // Ajouter l'écoute sur le bouton supprimer
@@ -257,6 +284,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             })
             .catch(() => alert("Erreur réseau lors de la suppression du pin"));
+    }
+
+    // DEPLACEMENT DU PIN 
+    function enterMoveMode(pinId) {
+        pinMoveMode = pinId;
+        alert("Cliquez sur la nouvelle position du pin");
     }
 
     //**********************************//
