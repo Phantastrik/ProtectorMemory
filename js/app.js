@@ -168,6 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <button id="delete-pin-btn" class="btn btn-danger btn-sm">Supprimer ce pin</button>
         <button class="btn btn-sm btn-secondary move-pin" data-id="${pinData.id}">Déplacer</button>
         <button class="btn btn-sm btn-warning add-pnj" id="add-pnj-btn" data-id="${pinData.id}">Add PNJ</button>
+        <button class="btn btn-sm btn-success add-build" id="add-build-btn" data-id="${pinData.id}">Add Build</button>
     `;
             document.querySelector(".move-pin").addEventListener("click", () => {
                 enterMoveMode(pinData.id);
@@ -183,15 +184,20 @@ document.addEventListener("DOMContentLoaded", () => {
             // Ajouter l'écoute sur le bouton add pnj
             document.getElementById("add-pnj-btn").addEventListener("click", () => {
                 choices = {
-                    'B' : 'Bruja',
-                    'M' : 'Mousseron',
-                    'C' : 'Cucurbitus',
-                    'K' : 'Kiore',
-                    'R' : 'Random'
+                    'B': 'Bruja',
+                    'M': 'Mousseron',
+                    'C': 'Cucurbitus',
+                    'K': 'Kiore',
+                    'R': 'Random'
                 };
                 choice = prompt(`Peuple : \n - (B)ruja\n - (C)ucurbitus\n - (K)iore\n - (M)ousseron)\n - (R)andom`, "R");
                 let peuple = choices[choice];
                 addPnj(peuple);
+            });
+            // Ajouter l'écoute sur le bouton add pnj
+            document.getElementById("add-build-btn").addEventListener("click", () => {
+                choice = prompt(`Peuple : \n - (B)ruja\n - (C)ucurbitus\n - (R)andom`, "R");
+                addBuild(choice);
             });
 
         });
@@ -783,6 +789,519 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
     }
+
+    //****************************//
+    //********* BATIMENT *********//
+    //****************************//
+    const buildings = {
+        "A": {
+            "name": "Oratoire",
+            "colors": {
+                "♥": "Permanent",
+                "♦": "Permanent",
+                "♣": "Ephemere",
+                "♠": "Ephemere"
+            }
+        },
+        "2": {
+            "name": "Boutique de potion",
+            "colors": {
+                "♥": "Grande",
+                "♦": "Grande",
+                "♣": "Petite",
+                "♠": "Petite"
+            },
+            "stock": {
+                "B": {
+                    1: {
+                        "name": "Tonique fulgurant",
+                        "effect": "Double l'endurance pour 1 jour et 1 nuit",
+                        "price": 100,
+                        "durability": 1,
+                        "craft": "1 thé racine, 1 champi commun"
+                    },
+                    2: {
+                        "name": "Ame en bouteille",
+                        "effect": "+1 âme, peut servir a payer en gare",
+                        "price": 100,
+                        "durability": 1,
+                        "craft": "1 âme"
+                    },
+                    3: {
+                        "name": "Potion de teleportation",
+                        "effect": "teleporte sur une case deja visitée",
+                        "price": 500,
+                        "durability": 1,
+                        "craft": "1 champignon d'ame, 1 eau"
+                    },
+                    4: {
+                        "name": "Philtre de chance",
+                        "effect": "Permet de relancer un dé ou une carte",
+                        "price": 50,
+                        "durability": 1,
+                        "craft": "2 petales de sauriflore, 1 cactus"
+                    },
+                    5: {
+                        "name": "Infusion pacifique",
+                        "effect": "Permet de calmer une créature de maniere permanent (sauf Ruines)",
+                        "price": 500,
+                        "durability": 1,
+                        "craft": "1 Biere de mycellium, 1 lichen de hérissin"
+                    },
+                    6: {
+                        "name": "Mixture confusante",
+                        "effect": "Permet de fuire une créature hostile sans jet de courage",
+                        "price": 250,
+                        "durability": 1,
+                        "craft": "1 épine de scarabée, 1 mais"
+                    }
+                },
+                "C": {
+                    1: {
+                        "name": "Sirop gargarisant",
+                        "effect": "Récupère 1 point d'attribut",
+                        "price": 50,
+                        "durability": 1,
+                        "craft": "1 mais, 1 eau, 1 champi commun"
+                    },
+                    2: {
+                        "name": "Beaume de champignon",
+                        "effect": "Appliqué immédiatement, guérit les dommages causés par les champis vénéneux",
+                        "price": 200,
+                        "durability": 1,
+                        "durability": 1,
+                        "craft": "1 biere de mycellium, 1 mais"
+                    },
+                    3: {
+                        "name": "Décoction florale",
+                        "effect": "Change la couleur d'un sauriflore",
+                        "price": 500,
+                        "durability": 1,
+                        "craft": "5 laréons de la même couleur"
+                    },
+                    4: {
+                        "name": "Thé transparent",
+                        "effect": "Rend invisible a toute créature pendant 1 jour et 1 nuit",
+                        "price": 300,
+                        "durability": 1,
+                        "craft": "1 eau, 1 or"
+                    },
+                    5: {
+                        "name": "Raffraichissement pétillant",
+                        "effect": "Permet de traverser le désert sans etre impacté par le climat",
+                        "price": 100,
+                        "durability": 1,
+                        "craft": "1 cactus, 1 eau, 1 charbon"
+                    },
+                    6: {
+                        "name": "Stimulant Hardi",
+                        "effect": "Diminue de 1 le jet de dé pour un test de courage",
+                        "price": 100,
+                        "durability": 1,
+                        "craft": "1 biere de mycellium, 2 cactus"
+                    }
+                }
+            }
+        },
+        "3": {
+            "name": "Boutique d'equipement'",
+            "colors": {
+                "♥": "Grande",
+                "♦": "Grande",
+                "♣": "Petite",
+                "♠": "Petite"
+            },
+            "stock": {
+                "B": {
+                    1: {
+                        "name": "Hache",
+                        "effect": "Permet de collecter facilement dans la foret des ombres",
+                        "price": 250,
+                        "durability": 10,
+                        "craft": "1 bois, 2 fer"
+                    },
+                    2: {
+                        "name": "Machinne a vapeur",
+                        "effect": "Permet de réactiver une gare a l'abandon",
+                        "price": 500,
+                        "durability": 1,
+                        "craft": "1 âme en bouteille, 1 fer"
+                    },
+                    3: {
+                        "name": "Tenue fongique",
+                        "effect": "Protege des spores de la jungle fongique pendant 1 jour et 1 nuit",
+                        "price": 300,
+                        "durability": 1,
+                        "craft": "1 or, 1 fer, 1 beaume champignon"
+                    },
+                    4: {
+                        "name": "Gants thermiques",
+                        "effect": "Annules les degats causés par les scarabées du desert",
+                        "price": 300,
+                        "durability": 5,
+                        "craft": "3 cactus, 1 Cuivre"
+                    },
+                    5: {
+                        "name": "Torche",
+                        "effect": "Annule les effets de l'obscurité",
+                        "price": 10,
+                        "durability": 1,
+                        "craft": "1 bois, 1 charbon"
+                    },
+                    6: {
+                        "name": "Epée",
+                        "effect": "Permet de fuir une bataille sans test de courage",
+                        "price": 300,
+                        "durability": 5,
+                        "craft": "3 cactus, 1 Cuivre"
+                    }
+                },
+                "C": {
+                    1: {
+                        "name": "Ciseaux de jardinage",
+                        "effect": "Permet de collecter facilement dans la mer champetre",
+                        "price": 250,
+                        "durability": 10,
+                        "craft": "2 bois, 2 fer"
+                    },
+                    2: {
+                        "name": "Pince a oursins",
+                        "effect": "Permet de collecter le lichen des hérissins",
+                        "price": 1000,
+                        "durability": 5,
+                        "craft": "2 epines de scarab, 1 bois"
+                    },
+                    3: {
+                        "name": "Bouclier",
+                        "effect": "Durant un test de courage, lance 2 dé et garde le plus faible",
+                        "price": 750,
+                        "durability": 5,
+                        "craft": "1 bois, 1 cuivre, 2 fer"
+                    },
+                    4: {
+                        "name": "Materiel d'escalade",
+                        "effect": "Permet d'escalader'",
+                        "price": 100,
+                        "durability": 5,
+                        "craft": "1 bois, 1 fer"
+                    },
+                    5: {
+                        "name": "Pioche",
+                        "effect": "Permet de collecter dans le desert silencieux",
+                        "price": 250,
+                        "durability": 10,
+                        "craft": "2 bois, 1 fer"
+                    },
+                    6: {
+                        "name": "Arrosoir",
+                        "effect": "Contient 6 unités d'eau, permet d'arroser",
+                        "price": 500,
+                        "durability": 999,
+                        "craft": "1 fer, 1 epine de scarabée"
+                    },
+                }
+            }
+        },
+        "4": {
+            "name": "Boutique de vetements",
+            "colors": {
+                "♥": "Grande",
+                "♦": "Grande",
+                "♣": "Petite",
+                "♠": "Petite"
+            },
+            "stock": {
+                "B": {
+                    1: {
+                        "name": "Chapeau Bruja",
+                        "effect": "[ensemble]: permet de creer des potions de n'importe ou, en ayant les ingrédients",
+                        "price": 500,
+                        "durability": 0,
+                        "craft": ""
+                    },
+                    2: {
+                        "name": "Pantalon Bruja",
+                        "effect": "[ensemble]: permet de creer des potions de n'importe ou, en ayant les ingrédients",
+                        "price": 500,
+                        "durability": 0,
+                        "craft": ""
+                    },
+                    3: {
+                        "name": "Pull Over Bruja",
+                        "effect": "[ensemble]: permet de creer des potions de n'importe ou, en ayant les ingrédients",
+                        "price": 500,
+                        "durability": 0,
+                        "craft": ""
+                    }
+                },
+                "C": {
+                    1: {
+                        "name": "Salopette Cucurbitus",
+                        "effect": "[ensemble]: Double la quantité d'objets trouvés pendant la collecte et l'extraction de minéraux",
+                        "price": 500,
+                        "durability": 0,
+                        "craft": ""
+                    },
+                    2: {
+                        "name": "Chapeau de paille",
+                        "effect": "[ensemble]: Double la quantité d'objets trouvés pendant la collecte et l'extraction de minéraux",
+                        "price": 500,
+                        "durability": 0,
+                        "craft": ""
+                    },
+                    3: {
+                        "name": "Bottes de jardinage",
+                        "effect": "[ensemble]: Double la quantité d'objets trouvés pendant la collecte et l'extraction de minéraux",
+                        "price": 500,
+                        "durability": 0,
+                        "craft": ""
+                    }
+                }
+            }
+        },
+        "5": {
+            "name": "Taverne",
+            "colors": {
+                "♥": "Grande",
+                "♦": "Grande",
+                "♣": "Petite",
+                "♠": "Petite"
+            },
+            "stock": {
+                "B": {
+                    1: {
+                        "name": "Biscuits aux fruits",
+                        "effect": "récupère 1 point d'atribut au choix et 1 point d'ame",
+                        "price": 80,
+                        "durability": 1,
+                        "craft": "1 mais, 1 fruit"
+                    },
+                    2: {
+                        "name": "Gateau aux pignons de pin",
+                        "effect": "Récupère 2 points d'endurance",
+                        "price": 20,
+                        "durability": 1,
+                        "craft": "1 feuille, 1 racine"
+                    },
+                    3: {
+                        "name": "Soupe aux herbes",
+                        "effect": "Récupère 1 point d'ame et 1 point de courage",
+                        "price": 70,
+                        "durability": 1,
+                        "craft": "4 feuille, 1 eau"
+                    },
+                    4: {
+                        "name": "Mijoté de tiges",
+                        "effect": "Récupère 2 points d'endurance",
+                        "price": 30,
+                        "durability": 1,
+                        "craft": "2 bois, 1 eau"
+                    },
+                    5: {
+                        "name": "Mille-feuille a la vapeur",
+                        "effect": "Récupère 2 points d'un attribut",
+                        "price": 80,
+                        "durability": 1,
+                        "craft": "1 feuille, 1 eau"
+                    },
+                    6: {
+                        "name": "Thé de racine",
+                        "effect": "Récupérer 3 point d'un meme attribut",
+                        "price": 100,
+                        "durability": 1,
+                        "craft": "1 eau, 2 racines"
+                    }
+                },
+                "C": {
+                    1: {
+                        "name": "Champignon à l'etouffée",
+                        "effect": "Récupère 2 points dans un attributs ",
+                        "price": 100,
+                        "durability": 1,
+                        "craft": "1 champi commun, 1 eau"
+                    },
+                    2: {
+                        "name": "Risotto aux truffes",
+                        "effect": "Récupère 3 points d'ame",
+                        "price": 90,
+                        "durability": 1,
+                        "craft": "1 champi commun, 1 riz"
+                    },
+                    3: {
+                        "name": "Soupe du chapelier",
+                        "effect": "Récupère 1 d'endurance et 1 point dans un attribut au choix",
+                        "price": 70,
+                        "durability": 1,
+                        "craft": "1 champi commun, 1 eau, 1 pomme de terre"
+                    },
+                    4: {
+                        "name": "Tourte aux champignons",
+                        "effect": "Récupère 1 point d'ame et 1 point d'attribut au choix",
+                        "price": 80,
+                        "durability": 1,
+                        "craft": "1 champi commun, 2 mais"
+                    },
+                    5: {
+                        "name": "Pain aux champignons sechés",
+                        "effect": "Récupère 1 point de courage et 1 point d'endurance",
+                        "price": 70,
+                        "durability": 1,
+                        "craft": "1 champi commun, 2 pommes de terre"
+                    },
+                    6: {
+                        "name": "Biere de mycellium",
+                        "effect": "Récupérer 3 point d'un meme attribut",
+                        "price": 120,
+                        "durability": 1,
+                        "craft": "2 eau, 1 champi commun, 1 mais"
+                    }
+                }
+            }
+        },
+        "6": {
+            "name": "Bureau de cartographie",
+            "colors": {
+                "♥": "Grande",
+                "♦": "Grande",
+                "♣": "Petite",
+                "♠": "Petite"
+            }
+        },
+        "7": {
+            "name": "Auberge",
+            "colors": {
+                "♥": "Grande",
+                "♦": "Grande",
+                "♣": "Petite",
+                "♠": "Petite"
+            }
+        },
+        "8": {
+            "name": "Agence de Mission",
+            "colors": {
+                "♥": "Grande",
+                "♦": "Grande",
+                "♣": "Petite",
+                "♠": "Petite"
+            }
+        },
+        "9": {
+            "name": "Gare",
+            "colors": {
+                "♥": "en activité",
+                "♦": "en activité",
+                "♣": "a l'abandon",
+                "♠": "a l'abandon"
+            }
+        },
+        "10": {
+            "name": "Ruine",
+            "colors": {
+                "♥": "",
+                "♦": "",
+                "♣": "",
+                "♠": ""
+            }
+        },
+        "J": {
+            "name": "[MOD]",
+            "colors": {
+                "♥": "Ville",
+                "♦": "Ville",
+                "♣": "Merveille",
+                "♠": "Merveille"
+            }
+        },
+        "Q": {
+            "name": "[MOD]",
+            "colors": {
+                "♥": "Fortifié",
+                "♦": "Fortifié",
+                "♣": "Luxuriant",
+                "♠": "Luxuriant"
+            }
+        },
+        "K": {
+            "name": "[MOD]",
+            "colors": {
+                "♥": "Abandonné",
+                "♦": "Abandonné",
+                "♣": "Nomade",
+                "♠": "Nomade"
+            }
+        }
+    }
+    function getNewBuild(peuple) {
+        let peoplechoisi = peuple;
+        if (peuple == "R") {
+            peuplechoisi = (lancerDe(2) == 1 ? "C" : "B");
+        }
+        const carteType = tirerCarte();
+        const build = {
+            "name": `${buildings[carteType.valeur]["name"]} - (${buildings[carteType.valeur]["colors"][carteType.couleur]})`
+        };
+        if (carteType.valeur === '2'
+            || carteType.valeur === '3'
+            || carteType.valeur === '4'
+            || carteType.valeur === '5') {
+            let isBig = (carteType.couleur === "♥" || carteType.couleur === "♦");
+            let d6 = 0;
+            if (carteType.valeur === "3") {
+                d6 = lancerDe(3);
+            } else {
+                d6 = lancerDe(6);
+            }
+            build.stocks = buildings[carteType.valeur]["stock"][peuplechoisi];
+            delete build.stocks[d6];
+
+            if (!isBig) {
+                d6 = lancerDe(Object.keys(build.stocks).length)
+                delete build.stocks[Object.keys(build.stocks)[d6]];
+
+                if (carteType.valeur !== "4") { // pour les boutiques d'equipement on retire 1 item, pour les autres c'est 2
+                    d6 = lancerDe(Object.keys(build.stocks).length)
+                    delete build.stocks[Object.keys(build.stocks)[d6]];
+
+                }
+            }
+        }
+        return build;
+
+    }
+    function addBuild(peuple) {
+        let build = getNewBuild(peuple);
+        let title = `[Batiment] - ${build.name}`;
+        let content = ".";
+        if (build.stocks) {
+            content = `------------ A Vendre -------------\n\n`;
+            Object.keys(build.stocks).forEach(key => {
+                let stock = build.stocks[key];
+                content += `[${stock.name}] - coût : ${stock.price} po \n`;
+                content += `~ Effets : ${stock.effect} \n`;
+                content += `~ Durabilité : ${stock.durability == 0 ? "Toujours" : (stock.durability + " utilisations")} \n`;
+                content += `~ Composants : ${stock.craft} \n`;
+                content += `___________________________________ \n\n`;
+            });
+        }
+
+        fetch("controllers/add_note.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // rafraîchir la liste des notes
+                    loadNotes(selectedPinId);
+                } else {
+                    alert("Erreur lors de la creation du Batiment : " + data.message);
+                }
+            });
+
+    }
+
+
 
     //************************//
     //********* MAIN *********//
