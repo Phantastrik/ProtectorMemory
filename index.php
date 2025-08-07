@@ -20,9 +20,9 @@ $imagePath = "images/" . $currentImage['filename'];
 <head>
     <meta charset="UTF-8">
     <title>Image avec notes</title>
-    <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
 
     <script src="js/app.js" defer></script>
 </head>
@@ -126,7 +126,7 @@ $imagePath = "images/" . $currentImage['filename'];
                         <button id="add-note-btn" class="btn btn-primary">Ajouter la note</button>
                     </div>
                 </div> -->
-                <div class="card bg-secondary text-light shadow-sm mb-3" id="edit-note-container">
+                <div class="card bg-secondary text-light shadow-sm mb-3" id="edit-note-container" hidden="true">
                     <div class="card-body">
 
                         <!-- Titre cliquable -->
@@ -137,7 +137,7 @@ $imagePath = "images/" . $currentImage['filename'];
                         </h5>
 
                         <!-- Contenu repliable -->
-                        <div class="collapse show" id="note-form-collapse">
+                        <div class="collapse" id="note-form-collapse">
                             <!-- Titre de la note -->
                             <div class="input-group mb-1">
                                 <span class="input-group-text bg-dark text-light" id="note-title-label">

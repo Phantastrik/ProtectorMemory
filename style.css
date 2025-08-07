@@ -72,6 +72,23 @@ lock-container {
 }
 
 #note-list {
-    max-height: 100vh;
+    max-height: 800px;
     overflow-y: auto;
 }
+.bg-orange-400{
+background-color: #9b592d;
+color : white;
+}
+.bg-green-400{
+background-color: #546b4d;
+color : white;
+}
+.bg-orange-800{
+background-color: #4e311f;
+color : white;
+}
+.bg-blue-700{
+background-color: #484c6e;
+color : white;
+}
+                                    

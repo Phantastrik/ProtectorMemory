@@ -11,14 +11,15 @@ $pin_id = intval($_POST["pin_id"] ?? 0);
 $title = trim($_POST["title"] ?? "");
 $content = trim($_POST["content"] ?? "");
 $type = trim($_POST["type"] ?? "STD");
+$peuple = trim($_POST["peuple"] ?? "none");
 if ($pin_id <= 0 || $title === "" || $content === "") {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => "Données invalides"]);
     exit;
 }
 
-$stmt = $conn->prepare("INSERT INTO notes (pin_id, title, content, type) VALUES (?, ?, ?,?)");
-$stmt->bind_param("isss", $pin_id, $title, $content, $type);
+$stmt = $conn->prepare("INSERT INTO notes (pin_id, title, content, type, peuple) VALUES (?, ?, ? ,?, ?)");
+$stmt->bind_param("issss", $pin_id, $title, $content, $type, $peuple);
 
 if ($stmt->execute()) {
     echo json_encode(["success" => true]);

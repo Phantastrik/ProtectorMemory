@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="card-body bg-secondary text-light">
             <h5 class="card-title">
-                <i class="bi bi-geo-alt-fill me-2 text-primary"></i>${pinData.title || "Sans titre"}
+                <i class="bi bi-geo-alt-fill me-2 text-white"></i>${pinData.title || "Sans titre"}
             </h5>
             <p class="card-text text-white">
                 <i class="bi bi-arrows-move me-2"></i>
@@ -521,7 +521,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     li.innerHTML = `
                                
-    <div class="card shadow-sm mb-3 bg-dark-subtle p-0">
+    <div class="card shadow-sm mb-3 bg-${note.peuple == "K" ? "orange-400":
+                                        note.peuple == "C" ? "green-400" : 
+                                        note.peuple == "B" ? "orange-800" :
+                                        note.peuple == "M" ? "blue-700" :
+                                        "dark-subtle"} p-0">
         <div class="card-body m-0">
             <div class="d-flex justify-content-between align-items-start">
                 <h5 class="card-title mb-0 flex-grow-1" 
@@ -532,9 +536,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     aria-controls="note-${note.id}-collapse" 
                     style="cursor: pointer;">
                     ${note.type === "BLD" ? ' <i class="bi bi-building me-2">' :
-                        note.type === "PNJ" ? ' <i class="bi bi-person-raised-hand me-2">' :
-                        ' <i class="bi bi-sticky-fill me-2">'
-                    }</i> 
+                            note.type === "PNJ" ? ' <i class="bi bi-person-raised-hand me-2">' :
+                                ' <i class="bi bi-sticky-fill me-2">'
+                        }</i> 
                     ${note.title}
                 </h5>
                 <div class="ms-2">
@@ -546,7 +550,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     </button>
                 </div>
             </div>
-            <p id="note-${note.id}-collapse" class="collapse show card-text small">${formattedContent}</p>
+            <p id="note-${note.id}-collapse" class="collapse card-text small">${formattedContent}</p>
         </div>
     </div>
 
@@ -565,6 +569,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     // `;
 
                     notesUl.appendChild(li);
+                    document.getElementById('edit-note-container').hidden = false;
                 });
 
                 // Ajouter les écouteurs pour modifier
@@ -631,18 +636,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById("edit-note-title").innerHTML = '<i class="bi bi-journal-plus me-2"></i>Nouvelle note<i class="bi bi-chevron-down float-end"></i>';
                     document.getElementById("add-note-btn").innerHTML = '<i class="bi bi-plus-circle me-1"></i>';
 
-                    document.getElementById("add-note-btn").onclick = () => noteCreationListener("STD");
+                    document.getElementById("add-note-btn").onclick = () => noteCreationListener("STD", "none");
                 } else {
                     alert("Erreur de modification");
                 }
             });
     }
     // LISTENER CREATION //
-    document.getElementById("add-note-btn").onclick = () => noteCreationListener("STD");
-    function noteCreationListener(typeNote) {
+    document.getElementById("add-note-btn").onclick = () => noteCreationListener("STD", "none");
+    function noteCreationListener(typeNote, peupleNote) {
         const title = document.getElementById("note-title").value.trim();
         const content = document.getElementById("note-content").value.trim();
         const type = typeNote || "STD";
+        const peuple = peupleNote || "none";
         if (!selectedPinId) {
             alert("Choisir un pin");
             return;
@@ -661,7 +667,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("controllers/add_note.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}&type=${encodeURIComponent(type)}`
+            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}&type=${encodeURIComponent(type)}&peuple=${encodeURIComponent(peuple)}`
         })
             .then(res => res.json())
             .then(data => {
@@ -840,11 +846,22 @@ document.addEventListener("DOMContentLoaded", () => {
         let pnj = getNewPNJ(peuple);
         let title = `[Vilageois] - ${pnj.name} (${pnj.peuple})`;
         let content = `[Nom] : ${pnj.name} \n [peuple] : ${pnj.peuple} \n [age] : ${pnj.age} \n [personalite] : ${pnj.trait} \n [phrase] : ${pnj.phrase}`;
+
+
+        let peuplesCle = {
+            "Bruja": "B",
+            "Cucurbitus": "C",
+            "Kiore": "K",
+            "Mousseron": "M"
+        }
+        peuple = peuplesCle[pnj.peuple];
+
+
         // Exemple d'envoi vers le backend
         fetch("controllers/add_note.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}&type=PNJ`
+            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}&type=PNJ&peuple=${encodeURIComponent(peuple)}`
         })
             .then(res => res.json())
             .then(data => {
@@ -1300,13 +1317,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     function getNewBuild(peuple) {
-        let peoplechoisi = peuple;
+        let peuplechoisi = peuple;
         if (peuple == "R") {
             peuplechoisi = (lancerDe(2) == 1 ? "C" : "B");
         }
         const carteType = tirerCarte();
         const build = {
-            "name": `${buildings[carteType.valeur]["name"]} - (${buildings[carteType.valeur]["colors"][carteType.couleur]})`
+            "name": `${buildings[carteType.valeur]["name"]} - (${buildings[carteType.valeur]["colors"][carteType.couleur]})`,
+            "peuple" : `${peuplechoisi}`
         };
         if (carteType.valeur === '2'
             || carteType.valeur === '3'
@@ -1340,6 +1358,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let build = getNewBuild(peuple);
         let title = `[Batiment] - ${build.name}`;
         let content = ".";
+        
         if (build.stocks) {
             content = `------------ A Vendre -------------\n\n`;
             Object.keys(build.stocks).forEach(key => {
@@ -1355,7 +1374,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("controllers/add_note.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}&type=BLD`
+            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}&type=BLD&peuple=${encodeURIComponent(build.peuple)}`
         })
             .then(res => res.json())
             .then(data => {
