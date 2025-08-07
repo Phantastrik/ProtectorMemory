@@ -520,22 +520,36 @@ document.addEventListener("DOMContentLoaded", () => {
                     const formattedContent = note.content.replace(/\n/g, "<br>");
 
                     li.innerHTML = `
-<div class="card shadow-sm mb-3 bg-dark-subtle">
-  <div class="card-body">
-    <h5 class="card-title d-flex justify-content-between align-items-center">
-      <span>${note.title}</span>
-      <div>
-        <button class="btn btn-sm btn-warning me-1 edit-note" data-id="${note.id}" title="Modifier">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button class="btn btn-sm btn-danger delete-note" data-id="${note.id}" title="Supprimer">
-          <i class="bi bi-trash"></i>
-        </button>
-      </div>
-    </h5>
-    <p class="card-text small">${formattedContent}</p>
-  </div>
-</div>
+                               
+    <div class="card shadow-sm mb-3 bg-dark-subtle p-0">
+        <div class="card-body m-0">
+            <div class="d-flex justify-content-between align-items-start">
+                <h5 class="card-title mb-0 flex-grow-1" 
+                    data-bs-toggle="collapse" 
+                    href="#note-${note.id}-collapse" 
+                    role="button" 
+                    aria-expanded="true" 
+                    aria-controls="note-${note.id}-collapse" 
+                    style="cursor: pointer;">
+                    ${note.type === "BLD" ? ' <i class="bi bi-building me-2">' :
+                        note.type === "PNJ" ? ' <i class="bi bi-person-raised-hand me-2">' :
+                        ' <i class="bi bi-sticky-fill me-2">'
+                    }</i> 
+                    ${note.title}
+                </h5>
+                <div class="ms-2">
+                    <button class="btn btn-sm btn-warning me-1 edit-note" data-id="${note.id}" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger delete-note" data-id="${note.id}" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <p id="note-${note.id}-collapse" class="collapse show card-text small">${formattedContent}</p>
+        </div>
+    </div>
+
 `;
 
 
@@ -562,7 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const content = card.querySelector(".card-text").innerText;
 
                         document.getElementById("edit-note-container").className = "card bg-secondary-subtle text-dark shadow-sm mb-3";
-                        document.getElementById("edit-note-title").innerHTML=  '<i class="bi bi-journal-plus me-2">Modifier la note</i><i class="bi bi-chevron-down float-end"></i>';
+                        document.getElementById("edit-note-title").innerHTML = '<i class="bi bi-journal-plus me-2">Modifier la note</i><i class="bi bi-chevron-down float-end"></i>';
                         document.getElementById("note-title").value = title;
                         document.getElementById("note-content").value = content;
                         document.getElementById("add-note-btn").innerHTML = '<i class="bi bi-pencil-fill me-1"></i>';
@@ -592,7 +606,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     });
                 });
-                document.getElementById("add-note-btn").onclick = noteCreationListener;
+                document.getElementById("add-note-btn").onclick = () => noteCreationListener("STD");
             });
     }
     function noteEditListener(noteId) {
@@ -612,22 +626,23 @@ document.addEventListener("DOMContentLoaded", () => {
                     loadNotes(selectedPinId);
                     document.getElementById("note-title").value = "";
                     document.getElementById("note-content").value = "";
-    
+
                     document.getElementById("edit-note-container").className = "card bg-secondary text-light shadow-sm mb-3";
-                    document.getElementById("edit-note-title").innerHTML=  '<i class="bi bi-journal-plus me-2"></i>Nouvelle note<i class="bi bi-chevron-down float-end"></i>';
+                    document.getElementById("edit-note-title").innerHTML = '<i class="bi bi-journal-plus me-2"></i>Nouvelle note<i class="bi bi-chevron-down float-end"></i>';
                     document.getElementById("add-note-btn").innerHTML = '<i class="bi bi-plus-circle me-1"></i>';
-                    
-                    document.getElementById("add-note-btn").onclick = () => noteCreationListener();
+
+                    document.getElementById("add-note-btn").onclick = () => noteCreationListener("STD");
                 } else {
                     alert("Erreur de modification");
                 }
             });
     }
     // LISTENER CREATION //
-    document.getElementById("add-note-btn").onclick = noteCreationListener;
-    function noteCreationListener() {
+    document.getElementById("add-note-btn").onclick = () => noteCreationListener("STD");
+    function noteCreationListener(typeNote) {
         const title = document.getElementById("note-title").value.trim();
         const content = document.getElementById("note-content").value.trim();
+        const type = typeNote || "STD";
         if (!selectedPinId) {
             alert("Choisir un pin");
             return;
@@ -646,7 +661,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("controllers/add_note.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`
+            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}&type=${encodeURIComponent(type)}`
         })
             .then(res => res.json())
             .then(data => {
@@ -829,7 +844,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("controllers/add_note.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`
+            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}&type=PNJ`
         })
             .then(res => res.json())
             .then(data => {
@@ -1340,7 +1355,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("controllers/add_note.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`
+            body: `pin_id=${selectedPinId}&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}&type=BLD`
         })
             .then(res => res.json())
             .then(data => {

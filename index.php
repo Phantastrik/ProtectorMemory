@@ -168,7 +168,7 @@ $imagePath = "images/" . $currentImage['filename'];
 
 
 
-                <ul id="notes-ul" class="list-group mb-3"></ul>
+                <ul id="notes-ul" class="list-group m-0"></ul>
 
             </div>
 
