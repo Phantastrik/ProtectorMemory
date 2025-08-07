@@ -53,8 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.arc(radius, radius, radius, start, end);
             ctx.closePath();
             ctx.fillStyle = i === index
-                ? "#8052713d"
-                : (i) < (totalSlices / 2) ? "#c6a520ff" : "#061937ff";
+                ? (i) < (totalSlices / 2) ? "#fdeba3ff" : "#6e8fc5ff"
+                : (i) < (totalSlices / 2) ? "#dba613ff" : "#1b66ddff";
             ctx.fill();
         }
     }
@@ -162,14 +162,43 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
+            //         document.getElementById("pin-info").innerHTML = `
+            //     <h5>${pinData.title || "Sans titre"}</h5>
+            //     <p>Coordonnées : ${pinData.x_percent.toFixed(2)}%, ${pinData.y_percent.toFixed(2)}%</p>
+            //     <button id="delete-pin-btn" class="btn btn-danger btn-sm">Supprimer ce pin</button>
+            //     <button class="btn btn-sm btn-secondary move-pin" data-id="${pinData.id}">Déplacer</button>
+            //     <button class="btn btn-sm btn-warning add-pnj" id="add-pnj-btn" data-id="${pinData.id}">Add PNJ</button>
+            //     <button class="btn btn-sm btn-success add-build" id="add-build-btn" data-id="${pinData.id}">Add Build</button>
+            // `;
             document.getElementById("pin-info").innerHTML = `
-        <h5>${pinData.title || "Sans titre"}</h5>
-        <p>Coordonnées : ${pinData.x_percent.toFixed(2)}%, ${pinData.y_percent.toFixed(2)}%</p>
-        <button id="delete-pin-btn" class="btn btn-danger btn-sm">Supprimer ce pin</button>
-        <button class="btn btn-sm btn-secondary move-pin" data-id="${pinData.id}">Déplacer</button>
-        <button class="btn btn-sm btn-warning add-pnj" id="add-pnj-btn" data-id="${pinData.id}">Add PNJ</button>
-        <button class="btn btn-sm btn-success add-build" id="add-build-btn" data-id="${pinData.id}">Add Build</button>
-    `;
+
+        <div class="card-body bg-secondary text-light">
+            <h5 class="card-title">
+                <i class="bi bi-geo-alt-fill me-2 text-primary"></i>${pinData.title || "Sans titre"}
+            </h5>
+            <p class="card-text text-white">
+                <i class="bi bi-arrows-move me-2"></i>
+                ${pinData.x_percent.toFixed(2)}%, ${pinData.y_percent.toFixed(2)}%
+            </p>
+
+            <div class="btn-group" role="group">
+                <button id="delete-pin-btn" class="btn btn-danger btn-sm" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button class="btn btn-primary btn-sm move-pin" data-id="${pinData.id}" title="Déplacer">
+                    <i class="bi bi-arrows-move"></i>
+                </button>
+                <button class="btn btn-warning btn-sm add-pnj" id="add-pnj-btn" data-id="${pinData.id}" title="Ajouter un PNJ">
+                    <i class="bi bi-person-plus"></i>
+                </button>
+                <button class="btn btn-success btn-sm add-build" id="add-build-btn" data-id="${pinData.id}" title="Ajouter un bâtiment">
+                    <i class="bi bi-house-add"></i>
+                </button>
+            </div>
+        </div>
+
+`;
+
             document.querySelector(".move-pin").addEventListener("click", () => {
                 enterMoveMode(pinData.id);
             });
@@ -490,17 +519,36 @@ document.addEventListener("DOMContentLoaded", () => {
                     li.classList.add("note-item");
                     const formattedContent = note.content.replace(/\n/g, "<br>");
 
-
                     li.innerHTML = `
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">${note.title}</h5>
-                    <p class="card-text">${formattedContent}</p>
-                    <button class="btn btn-sm btn-warning edit-note" data-id="${note.id}">Modifier</button>
-                    <button class="btn btn-sm btn-danger delete-note" data-id="${note.id}">Supprimer</button>
-                </div>
-            </div>
-            `;
+<div class="card shadow-sm mb-3 bg-dark-subtle">
+  <div class="card-body">
+    <h5 class="card-title d-flex justify-content-between align-items-center">
+      <span>${note.title}</span>
+      <div>
+        <button class="btn btn-sm btn-warning me-1 edit-note" data-id="${note.id}" title="Modifier">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-sm btn-danger delete-note" data-id="${note.id}" title="Supprimer">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    </h5>
+    <p class="card-text small">${formattedContent}</p>
+  </div>
+</div>
+`;
+
+
+                    //         li.innerHTML = `
+                    // <div class="card">
+                    //     <div class="card-body">
+                    //         <h5 class="card-title">${note.title}</h5>
+                    //         <p class="card-text">${formattedContent}</p>
+                    //         <button class="btn btn-sm btn-warning edit-note" data-id="${note.id}">Modifier</button>
+                    //         <button class="btn btn-sm btn-danger delete-note" data-id="${note.id}">Supprimer</button>
+                    //     </div>
+                    // </div>
+                    // `;
 
                     notesUl.appendChild(li);
                 });
@@ -513,9 +561,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         const title = card.querySelector(".card-title").innerText;
                         const content = card.querySelector(".card-text").innerText;
 
+                        document.getElementById("edit-note-container").className = "card bg-secondary-subtle text-dark shadow-sm mb-3";
+                        document.getElementById("edit-note-title").innerHTML=  '<i class="bi bi-journal-plus me-2">Modifier la note</i><i class="bi bi-chevron-down float-end"></i>';
                         document.getElementById("note-title").value = title;
                         document.getElementById("note-content").value = content;
-                        document.getElementById("add-note-btn").innerText = "Modifier";
+                        document.getElementById("add-note-btn").innerHTML = '<i class="bi bi-pencil-fill me-1"></i>';
 
                         document.getElementById("add-note-btn").onclick = () => noteEditListener(noteId);
                     };
@@ -562,9 +612,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     loadNotes(selectedPinId);
                     document.getElementById("note-title").value = "";
                     document.getElementById("note-content").value = "";
-                    document.getElementById("add-note-btn").innerText = "Ajouter la note";
+    
+                    document.getElementById("edit-note-container").className = "card bg-secondary text-light shadow-sm mb-3";
+                    document.getElementById("edit-note-title").innerHTML=  '<i class="bi bi-journal-plus me-2"></i>Nouvelle note<i class="bi bi-chevron-down float-end"></i>';
+                    document.getElementById("add-note-btn").innerHTML = '<i class="bi bi-plus-circle me-1"></i>';
+                    
                     document.getElementById("add-note-btn").onclick = () => noteCreationListener();
-
                 } else {
                     alert("Erreur de modification");
                 }

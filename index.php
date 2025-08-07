@@ -22,55 +22,76 @@ $imagePath = "images/" . $currentImage['filename'];
     <title>Image avec notes</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
     <script src="js/app.js" defer></script>
 </head>
 
-<body class="p-4">
+<body class="p-0 bg-dark">
 
     <div class="container-fluid">
-        <h2 class="mb-3">Protector Memory Hex Pinner</h2>
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <!-- Titre -->
+                <a class="navbar-brand" href="#">Protector Memory</a>
 
-        <!-- Sélecteur d’image -->
-        <div class="row">
-            <div class="col mb4">
-                <label for="image-select" class="form-label">Choisir une image :</label>
-                <select id="image-select" class="form-select w-auto d-inline-block">
-                    <?php foreach ($images as $img): ?>
-                        <option value="<?= $img['id'] ?>" <?= $img['id'] == $selectedImageId ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($img['title'] ?? $img['filename']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col mb4">
-                <button id="link-mode-btn" class="btn btn-outline-primary mb-2">Relier des pins</button>
-            </div>
-            <!-- generateur de PNJ -->
-            <div class="col mb4">
-                <button class="btn btn-outline-primary mb-2" onclick="window.open('PNJ_generator/index.html', '_blank')">Générateur de PNJ</button>
+                <!-- Bouton hamburger (mobile) -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-            </div>
+                <!-- Contenu de la navbar -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
 
-            <div class="col mb4" id="clock-container">
-                <canvas id="clock-canvas" width="100" height="100"></canvas>
-                <div class="controls">
-                    <label for="endurance">Endurance :</label>
-                    <select id="endurance">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4" selected>4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                    </select>
-                    <button id="advance-btn">Avancer</button>
+                        <!-- Choix d'image -->
+                        <li class="nav-item me-3">
+                            <label for="image-select" class="form-label text-white mb-0 me-2">Choisir une image :</label>
+                            <select id="image-select" class="form-select form-select-sm d-inline-block w-auto">
+                                <?php foreach ($images as $img): ?>
+                                    <option value="<?= $img['id'] ?>" <?= $img['id'] == $selectedImageId ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($img['title'] ?? $img['filename']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </li>
+
+                        <!-- Bouton relier des pins -->
+                        <li class="nav-item me-3">
+                            <button id="link-mode-btn" class="btn btn-outline-light btn-sm">Relier des pins</button>
+                        </li>
+
+                        <!-- Générateur de PNJ -->
+                        <li class="nav-item me-3">
+                            <button class="btn btn-outline-light btn-sm"
+                                onclick="window.open('PNJ_generator/index.html', '_blank')">Générateur de PNJ</button>
+                        </li>
+                    </ul>
+
+                    <!-- Horloge à droite -->
+                    <div class="d-flex align-items-center text-white" id="clock-container">
+                        <canvas id="clock-canvas" width="80" height="80"></canvas>
+                        <div class="ms-3 controls">
+                            <label for="endurance" class="form-label mb-0 me-1">Endurance :</label>
+                            <select id="endurance" class="form-select form-select-sm d-inline-block w-auto me-2">
+                                <?php for ($i = 1; $i <= 6; $i++): ?>
+                                    <option value="<?= $i ?>" <?= $i == 4 ? 'selected' : '' ?>><?= $i ?></option>
+                                <?php endfor; ?>
+                            </select>
+                            <button id="advance-btn" class="btn btn-sm btn-outline-light">Avancer</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </nav>
+
+
 
         <div class="row">
 
-            <div class="col-md-8 position-relative" id="image-container">
+            <div class="col-md-8 position-relative bg-dark" id="image-container">
                 <svg
                     id="connections"
                     class="position-absolute w-100 h-100"
@@ -81,14 +102,21 @@ $imagePath = "images/" . $currentImage['filename'];
             </div>
 
 
-            <div class="col-md-4" id="note-list">
-                <div id="pin-info" class="mb-3">
-                    <h5>Pin sélectionné</h5>
-                    <p>...</p>
-                </div>
-                <div class="card">
 
+            <div class="col-md-4" id="note-list">
+
+                <div class="card mb-3 shadow-sm bg-secondary" id="pin-info">
                     <div class="card-body">
+                        <h5 class="card-title text-light">
+                            <i class="bi bi-geo-alt-fill me-2 text-light"></i>Selectionner un Pin
+                        </h5>
+
+                    </div>
+                </div>
+
+                <!-- <div class="card p-2 bg-secondary">
+
+                    <div class="card-body text-light">
                         <div class="card-title">
                             <label for="note-title" class="form-label">Titre</label>
                             <input type="text" id="note-title" class="form-control" placeholder="Titre de la note" />
@@ -97,7 +125,48 @@ $imagePath = "images/" . $currentImage['filename'];
                         <textarea id="note-content" class="form-control" placeholder="Contenu de la note..."></textarea> <br>
                         <button id="add-note-btn" class="btn btn-primary">Ajouter la note</button>
                     </div>
+                </div> -->
+                <div class="card bg-secondary text-light shadow-sm mb-3" id="edit-note-container">
+                    <div class="card-body">
+
+                        <!-- Titre cliquable -->
+                        <h5 class="card-title mb-2" data-bs-toggle="collapse" href="#note-form-collapse" role="button" aria-expanded="true" aria-controls="note-form-collapse" style="cursor: pointer;"
+                        id="edit-note-title">
+                            <i class="bi bi-journal-plus me-2"></i>Nouvelle note
+                            <i class="bi bi-chevron-down float-end"></i>
+                        </h5>
+
+                        <!-- Contenu repliable -->
+                        <div class="collapse show" id="note-form-collapse">
+                            <!-- Titre de la note -->
+                            <div class="input-group mb-1">
+                                <span class="input-group-text bg-dark text-light" id="note-title-label">
+                                    <i class="bi bi-bookmark-fill"></i>
+                                </span>
+                                <input type="text" id="note-title" class="form-control" placeholder="Titre de la note"
+                                    aria-label="Titre de la note" aria-describedby="note-title-label">
+                            </div>
+
+                            <!-- Contenu de la note -->
+                            <div class="input-group mb-2">
+                                <span class="input-group-text bg-dark text-light" id="note-content-label">
+                                    <i class="bi bi-card-text"></i>
+                                </span>
+                                <textarea id="note-content" class="form-control" rows="5" placeholder="Contenu de la note"
+                                    aria-label="Contenu de la note" aria-describedby="note-content-label"></textarea>
+                            </div>
+
+                            <!-- Bouton Ajouter -->
+                            <button id="add-note-btn" class="btn btn-success">
+                                <i class="bi bi-plus-circle me-1"></i> 
+                            </button>
+                        </div>
+
+                    </div>
                 </div>
+
+
+
 
                 <ul id="notes-ul" class="list-group mb-3"></ul>
 
