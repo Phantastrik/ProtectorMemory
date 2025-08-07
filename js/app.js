@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(pins => {
                 pins.forEach(pinData => {
                     createPinElement(pinData);
+
                 });
             });
         loadLinks();
@@ -136,12 +137,21 @@ document.addEventListener("DOMContentLoaded", () => {
         pin.classList.add("pin");
         pin.style.left = `${pinData.x_percent}%`;
         pin.style.top = `${pinData.y_percent}%`;
-        pin.style.backgroundColor = pinData.color || "#ff0000";
+        // pin.style.backgroundColor = pinData.color || "#ff0000";
         pin.title = pinData.title || "";
         pin.dataset.pinId = pinData.id;
         if (pinData.label) {
             pin.textContent = pinData.label;
         }
+        if (pinData.favorite) {
+            pin.classList.add("favorite_pin");
+            pin.style.setProperty("--pin-border-color", pinData.color); // background devient border
+            pin.style.setProperty("--pin-bg-color", "rgba(255,255,255,0.5)"); // background devient border
+        } else {
+ pin.style.setProperty("--pin-border-color", "#FFFFFF"); // background devient border
+            pin.style.setProperty("--pin-bg-color", pinData.color); // background devient border
+        }
+
 
         pin.addEventListener("click", function (event) {
             event.stopPropagation();
@@ -194,6 +204,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 <button class="btn btn-success btn-sm add-build" id="add-build-btn" data-id="${pinData.id}" title="Ajouter un bâtiment">
                     <i class="bi bi-house-add"></i>
                 </button>
+                 <button class="btn btn-warning btn-sm set-favorite" id="set-favorite-btn" data-id="${pinData.id}" title="Favori">
+                    <i class="bi bi-star-fill"></i>
+                </button>
             </div>
         </div>
 
@@ -227,6 +240,11 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("add-build-btn").addEventListener("click", () => {
                 choice = prompt(`Peuple : \n - (B)ruja\n - (C)ucurbitus\n - (R)andom`, "R");
                 addBuild(choice);
+            });
+
+            // Ajouter l'écoute sur le bouton set favorite 
+            document.getElementById("set-favorite-btn").addEventListener("click", () => {
+                setFavorite(pinData);
             });
 
         });
@@ -341,6 +359,30 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Cliquez sur la nouvelle position du pin");
     }
 
+    function setFavorite(pinData) {
+
+        pinData.favorite = !pinData.favorite;
+        fetch("controllers/edit_pin.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: pinData.id,
+                x: pinData.x,
+                y: pinData.y,
+                image_id: imageId,
+                title: pinData.title,
+                color: pinData.color,
+                label: pinData.label,
+                favorite: pinData.favorite
+            })
+        }).then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadPins();
+                }
+            });
+    }
+
     //**********************************//
     //*******LIENS ENTRE LES PINS*******//
     //**********************************//
@@ -441,7 +483,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Re-dessiner toutes les connections
         for (const link of links) {
-            console.log("draw link from redraw");
+
             drawConnection(link);
         }
     }
@@ -521,10 +563,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     li.innerHTML = `
                                
-    <div class="card shadow-sm mb-3 bg-${note.peuple == "K" ? "orange-400":
-                                        note.peuple == "C" ? "green-400" : 
-                                        note.peuple == "B" ? "orange-800" :
-                                        note.peuple == "M" ? "blue-700" :
+    <div class="card shadow-sm mb-3 bg-${note.peuple == "K" ? "orange-400" :
+                            note.peuple == "C" ? "green-400" :
+                                note.peuple == "B" ? "orange-800" :
+                                    note.peuple == "M" ? "blue-700" :
                                         "dark-subtle"} p-0">
         <div class="card-body m-0">
             <div class="d-flex justify-content-between align-items-start">
@@ -1324,7 +1366,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const carteType = tirerCarte();
         const build = {
             "name": `${buildings[carteType.valeur]["name"]} - (${buildings[carteType.valeur]["colors"][carteType.couleur]})`,
-            "peuple" : `${peuplechoisi}`
+            "peuple": `${peuplechoisi}`
         };
         if (carteType.valeur === '2'
             || carteType.valeur === '3'
@@ -1358,7 +1400,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let build = getNewBuild(peuple);
         let title = `[Batiment] - ${build.name}`;
         let content = ".";
-        
+
         if (build.stocks) {
             content = `------------ A Vendre -------------\n\n`;
             Object.keys(build.stocks).forEach(key => {

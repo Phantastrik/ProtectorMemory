@@ -1,0 +1,3 @@
+
+ALTER TABLE pins
+ADD COLUMN favorite BOOLEAN DEFAULT false;

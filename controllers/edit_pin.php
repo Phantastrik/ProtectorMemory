@@ -8,15 +8,16 @@ if ($conn->connect_error) {
 }
 
 $data = json_decode(file_get_contents("php://input"), true);
-$id = (int)($data["id"] ?? 0);
-$content = trim($data["content"] ?? "");
+$id = $data["id"] ?? 0;
+$favorite = $data["favorite"] ?? false; 
+$label = $data["label"] ?? " "; 
 
-if ($id <= 0 || $content === "") {
+if ($id <= 0 ) {
     http_response_code(400);
     echo json_encode(["error" => "Paramètres invalides"]);
     exit;
 }
 
-$stmt = $conn->prepare("UPDATE notes SET content = ?, updated_at = NOW() WHERE id = ?");
-$stmt->bind_param("si", $content, $id);
+$stmt = $conn->prepare("UPDATE pins SET favorite = ?, label = ?, created_at = NOW() WHERE id = ?");
+$stmt->bind_param("isi", $favorite,$label, $id);
 echo json_encode(["success" => $stmt->execute()]);
