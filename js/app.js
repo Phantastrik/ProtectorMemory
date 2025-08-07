@@ -655,6 +655,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 document.getElementById("add-note-btn").onclick = () => noteCreationListener("STD");
             });
+        loadLinks();
     }
     function noteEditListener(noteId) {
         const newTitle = document.getElementById("note-title").value.trim();
@@ -1430,7 +1431,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
+    // NAVBAR BOUTON RAND //
+    // dé
+    document.getElementById("d6-btn").onclick = () => {
+        document.getElementById("d6-btn").innerText = '[' + lancerDe(6) + ']';
+    }
+    // carte
+    document.getElementById("draw-card-btn").onclick = () => {
+        const carte = tirerCarte()
+        document.getElementById("draw-card-btn").innerText = '[' + carte.couleur + carte.valeur + ']';
+    }
 
     //************************//
     //********* MAIN *********//
