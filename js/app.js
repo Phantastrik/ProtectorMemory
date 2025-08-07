@@ -521,10 +521,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     li.innerHTML = `
                                
-    <div class="card shadow-sm mb-3 bg-${note.peuple == "K" ? "orange-400":
-                                        note.peuple == "C" ? "green-400" : 
-                                        note.peuple == "B" ? "orange-800" :
-                                        note.peuple == "M" ? "blue-700" :
+    <div class="card shadow-sm mb-3 bg-${note.peuple == "K" ? "orange-400" :
+                            note.peuple == "C" ? "green-400" :
+                                note.peuple == "B" ? "orange-800" :
+                                    note.peuple == "M" ? "blue-700" :
                                         "dark-subtle"} p-0">
         <div class="card-body m-0">
             <div class="d-flex justify-content-between align-items-start">
@@ -613,6 +613,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 document.getElementById("add-note-btn").onclick = () => noteCreationListener("STD");
             });
+        loadLinks();
     }
     function noteEditListener(noteId) {
         const newTitle = document.getElementById("note-title").value.trim();
@@ -1324,7 +1325,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const carteType = tirerCarte();
         const build = {
             "name": `${buildings[carteType.valeur]["name"]} - (${buildings[carteType.valeur]["colors"][carteType.couleur]})`,
-            "peuple" : `${peuplechoisi}`
+            "peuple": `${peuplechoisi}`
         };
         if (carteType.valeur === '2'
             || carteType.valeur === '3'
@@ -1358,7 +1359,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let build = getNewBuild(peuple);
         let title = `[Batiment] - ${build.name}`;
         let content = ".";
-        
+
         if (build.stocks) {
             content = `------------ A Vendre -------------\n\n`;
             Object.keys(build.stocks).forEach(key => {
@@ -1388,7 +1389,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
+    // NAVBAR BOUTON RAND //
+    // dé
+    document.getElementById("d6-btn").onclick = () => {
+        document.getElementById("d6-btn").innerText = '[' + lancerDe(6) + ']';
+    }
+    // carte
+    document.getElementById("draw-card-btn").onclick = () => {
+        const carte = tirerCarte()
+        document.getElementById("draw-card-btn").innerText = '[' + carte.couleur + carte.valeur + ']';
+    }
 
     //************************//
     //********* MAIN *********//

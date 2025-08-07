@@ -68,8 +68,16 @@ $imagePath = "images/" . $currentImage['filename'];
                             <button class="btn btn-outline-light btn-sm"
                                 onclick="window.open('PNJ_generator/index.html', '_blank')">Générateur de PNJ</button>
                         </li>
-                    </ul>
 
+                        <!-- D6 -->
+                        <li class="nav-item me-3">
+                            <button id="d6-btn" class="btn btn-outline-light btn-sm p-4">D6</button>
+                        </li>
+                        <!-- Tirage carte -->
+                        <li class="nav-item me-3">
+                            <button id="draw-card-btn" class="btn btn-outline-light btn-sm p-4">[♠]</button>
+                        </li>
+                    </ul>
                     <!-- Horloge à droite -->
                     <div class="d-flex align-items-center text-white" id="clock-container">
                         <canvas id="clock-canvas" width="80" height="80"></canvas>
@@ -131,7 +139,7 @@ $imagePath = "images/" . $currentImage['filename'];
 
                         <!-- Titre cliquable -->
                         <h5 class="card-title mb-2" data-bs-toggle="collapse" href="#note-form-collapse" role="button" aria-expanded="true" aria-controls="note-form-collapse" style="cursor: pointer;"
-                        id="edit-note-title">
+                            id="edit-note-title">
                             <i class="bi bi-journal-plus me-2"></i>Nouvelle note
                             <i class="bi bi-chevron-down float-end"></i>
                         </h5>
@@ -158,7 +166,7 @@ $imagePath = "images/" . $currentImage['filename'];
 
                             <!-- Bouton Ajouter -->
                             <button id="add-note-btn" class="btn btn-success">
-                                <i class="bi bi-plus-circle me-1"></i> 
+                                <i class="bi bi-plus-circle me-1"></i>
                             </button>
                         </div>
 

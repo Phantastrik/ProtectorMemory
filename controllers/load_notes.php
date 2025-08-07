@@ -6,7 +6,7 @@ if ($conn->connect_error) { http_response_code(500); echo json_encode(["error" =
 $pin_id = isset($_GET['pin_id']) ? (int)$_GET['pin_id'] : 0;
 if ($pin_id <= 0) { http_response_code(400); echo json_encode(["error" => "pin_id manquant"]); exit; }
 
-$stmt = $conn->prepare("SELECT * FROM notes WHERE pin_id = ?");
+$stmt = $conn->prepare("SELECT * FROM notes WHERE pin_id = ? order by created_at desc");
 $stmt->bind_param("i", $pin_id);
 $stmt->execute();
 $result = $stmt->get_result();
